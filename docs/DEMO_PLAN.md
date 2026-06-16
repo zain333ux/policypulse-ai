@@ -82,7 +82,19 @@ While it runs, say:
 “The system is running five agents: policy extraction, sentiment analysis, concern clustering, gap detection, and recommendation generation.”
 
 ---
+## Optional Bonus Demo: Generate Feedback Survey
 
+If time allows during the demo, show the bonus feature:
+
+1. Upload or load the sample attendance policy.
+2. Click “Generate Feedback Survey”.
+3. Show the AI-generated survey title, description, questions, and sharing message.
+4. Explain that this can be copied into Google Forms and shared with students.
+5. Explain that after responses are collected, they can be exported as CSV and uploaded back into PolicyPulse AI for analysis.
+
+Demo statement:
+
+“PolicyPulse AI supports both stages of consultation. If feedback already exists, it analyzes it. If feedback has not been collected yet, it generates a ready-to-share survey template.”
 ### 5. Show Results — 90 seconds
 
 Show these tabs:
@@ -132,6 +144,85 @@ Say:
 “This memo can be used by a university committee, student council, or civic office to make a more informed decision.”
 
 ---
+## Judge-Impressing Demo Highlights
+
+During the demo, highlight these features clearly.
+
+### 1. Load Demo Scenario
+
+Before running the analysis, click:
+
+`Load Demo Scenario`
+
+Say:
+
+“To make the demo smooth, we prepared a realistic attendance policy and student feedback dataset.”
+
+### 2. Multi-Agent Pipeline View
+
+Point to the visible pipeline:
+
+Policy Extraction Agent → Sentiment Agent → Concern Clustering Agent → Gap Detection Agent → Recommendation Agent
+
+Say:
+
+“This is not a single chatbot response. Each agent has a separate responsibility, and the final report is created by chaining their outputs.”
+
+### 3. Evidence-Based Concern Clusters
+
+In the Public Concerns tab, show actual quotes.
+
+Say:
+
+“Each concern is backed by evidence from real comments, so the report is traceable and not just a generic summary.”
+
+### 4. Concern Frequency
+
+Show concern count or frequency.
+
+Say:
+
+“Instead of vague confidence claims, we show how often a concern appears in the feedback.”
+
+Example:
+
+“Medical exemptions were mentioned in 7 out of 25 comments.”
+
+### 5. RAG-Augmented Gap Detection
+
+In the Policy Gaps tab, show that each gap is compared against a policy design principle.
+
+Say:
+
+“Our gap detection uses a lightweight local knowledge base of policy design principles, such as appeal process, accessibility, exemptions, and transparent penalties.”
+
+### 6. Priority-Ranked Recommendations
+
+In the Recommendations tab, highlight:
+
+* Critical
+* Important
+* Nice-to-have
+
+Say:
+
+“This helps administrators know what to fix first.”
+
+### 7. Downloadable Executive Memo
+
+In the Executive Memo tab, show the download button.
+
+Say:
+
+“The final output can be downloaded and shared with a committee, student council, or public office.”
+
+### 8. Optional Survey Generator
+
+If time allows, show the survey generator.
+
+Say:
+
+“PolicyPulse AI supports both stages of consultation. If feedback exists, it analyzes it. If feedback has not been collected yet, it generates a Google-Forms-ready survey template.”
 
 ## Closing Statement — 30 seconds
 

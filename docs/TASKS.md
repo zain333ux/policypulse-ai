@@ -579,6 +579,252 @@ Acceptance Criteria:
 * Executive Memo shows copy-ready memo.
 
 ---
+# Phase 8 — Judge-Impressing Features
+
+## Task 8.1 — Add Pre-Loaded Demo Scenario Button
+
+Goal:
+
+Update `app.py` to include a `Load Demo Scenario` button.
+
+When clicked, the app should load:
+
+* `sample_data/attendance_policy.txt`
+* `sample_data/student_comments.csv`
+
+Acceptance Criteria:
+
+* Button loads sample policy text.
+* Button loads sample comments.
+* User can run analysis without uploading files.
+* Demo flow becomes faster and safer.
+
+Priority:
+
+Must-have.
+
+---
+
+## Task 8.2 — Add Visible Agent Pipeline View
+
+Goal:
+
+Update the Streamlit UI to show the multi-agent pipeline visually.
+
+Display:
+
+Policy Extraction Agent → Public Sentiment Agent → Concern Clustering Agent → Gap Detection Agent → Recommendation Agent
+
+Optional display:
+
+Survey Generator Agent
+
+Acceptance Criteria:
+
+* Pipeline is visible before or during analysis.
+* Judges can immediately understand the agent architecture.
+* UI makes clear that each agent has a separate role.
+
+Priority:
+
+Must-have.
+
+---
+
+## Task 8.3 — Add Evidence Quotes to Concern Clusters
+
+Goal:
+
+Ensure the Concern Clustering Agent returns sample comments for each concern cluster.
+
+Each concern cluster should include:
+
+* theme
+* count
+* summary
+* sample_comments
+
+Acceptance Criteria:
+
+* Each major concern includes at least one real quote.
+* Quotes come from the uploaded comments.
+* Public Concerns tab displays evidence quotes clearly.
+
+Priority:
+
+Must-have.
+
+---
+
+## Task 8.4 — Add Recommendation Priority Ranking
+
+Goal:
+
+Update the Recommendation Agent so each recommendation has a priority level.
+
+Priority levels:
+
+* Critical
+* Important
+* Nice-to-have
+
+Recommended output format:
+
+* priority
+* recommendation
+* reason
+* affected_group
+
+Acceptance Criteria:
+
+* Recommendations are grouped or labeled by priority.
+* Critical recommendations appear first.
+* UI displays priority clearly.
+
+Priority:
+
+Must-have.
+
+---
+
+## Task 8.5 — Make Lightweight RAG Visible in Gap Detection
+
+Goal:
+
+Update the Gap Detection Agent so each gap compares:
+
+* public concern
+* whether policy covers it
+* relevant policy principle
+* gap description
+* severity
+* suggested fix
+
+Acceptance Criteria:
+
+* Gap table includes a policy principle or design standard.
+* Gap Agent uses `get_policy_principles()`.
+* Demo can honestly describe this as lightweight RAG-augmented gap detection.
+
+Priority:
+
+Must-have.
+
+---
+
+## Task 8.6 — Add Concern Frequency / Evidence Strength
+
+Goal:
+
+Show evidence-based frequency instead of vague AI confidence.
+
+Examples:
+
+* Mentioned in 8 out of 25 comments
+* Concern Frequency: 32%
+* Evidence Strength: High
+
+Acceptance Criteria:
+
+* Concern clusters show count.
+* UI calculates frequency from total comments.
+* Evidence strength is based on frequency:
+
+  * High: 30% or more
+  * Medium: 15% to 29%
+  * Low: below 15%
+
+Priority:
+
+Recommended.
+
+---
+
+## Task 8.7 — Add Downloadable Executive Memo
+
+Goal:
+
+Add a Streamlit download button in the Executive Memo tab.
+
+File format:
+
+`.md` or `.txt`
+
+Suggested file name:
+
+`policy_consultation_memo.md`
+
+Acceptance Criteria:
+
+* Download button appears after analysis.
+* Downloaded file includes executive memo.
+* File also includes policy summary, top concerns, gaps, and recommendations if possible.
+
+Priority:
+
+Recommended.
+
+---
+
+## Task 8.8 — Add Concern Bar Chart
+
+Goal:
+
+Add a simple visual chart showing top concern clusters.
+
+Preferred option:
+
+Use Streamlit native chart or Plotly bar chart.
+
+Avoid complicated word cloud dependencies unless everything else is complete.
+
+Acceptance Criteria:
+
+* Chart shows concern themes and counts.
+* Chart appears in Public Concerns or Overview tab.
+* Chart is readable during demo.
+
+Priority:
+
+Recommended.
+
+---
+
+## Task 8.9 — Add Admin vs Student Perspective
+
+Goal:
+
+Split selected recommendations into two perspectives:
+
+* What Admin Should Do
+* What Students Should Know
+
+Acceptance Criteria:
+
+* UI shows two columns.
+* Admin column contains policy actions.
+* Student column contains practical student-facing information.
+
+Priority:
+
+Optional.
+
+---
+
+# Updated Feature Priority
+
+Complete in this order:
+
+1. Core pipeline stable
+2. Load Demo Scenario button
+3. Pipeline View
+4. Evidence quotes
+5. Priority-ranked recommendations
+6. Lightweight RAG-visible gap table
+7. Downloadable memo
+8. Concern bar chart
+9. Survey generator
+10. Admin vs Student perspective
 
 # Phase 8 — Polish
 
@@ -619,7 +865,41 @@ Acceptance Criteria:
 * Report includes summary, concerns, gaps, recommendations, and memo.
 
 ---
+# Phase 8.3 — Optional Feedback Survey Generator
 
+## Task 8.3 — Build Survey Generator Agent
+
+Goal:
+
+Create `src/agents/survey_generator_agent.py`.
+
+Function:
+
+```python
+generate_feedback_survey(policy_analysis: dict, policy_text: str) -> dict
+{
+  "survey_title": "",
+  "survey_description": "",
+  "questions": [
+    {
+      "question": "",
+      "type": "multiple_choice | checkbox | short_answer | paragraph | linear_scale",
+      "options": [],
+      "required": true,
+      "purpose": ""
+    }
+  ],
+  "sharing_message": "",
+  "google_forms_setup_steps": []
+}
+Acceptance Criteria:
+
+Generates 6–8 policy-specific survey questions.
+Includes different question types.
+Includes options for multiple-choice questions.
+Includes a copy-ready sharing message.
+Includes manual Google Forms setup steps.
+Does not require Google OAuth or Google Forms API.
 # Phase 9 — Testing
 
 ## Task 9.1 — Manual Test

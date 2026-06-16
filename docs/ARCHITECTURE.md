@@ -269,7 +269,31 @@ Output:
 Purpose:
 
 This agent creates the final actionable recommendations and official memo.
+### 6.6 Survey Generator Agent Optional
 
+Input:
+
+- policy text
+- policy extraction result
+
+Output:
+
+```json
+{
+  "survey_title": "",
+  "survey_description": "",
+  "questions": [
+    {
+      "question": "",
+      "type": "multiple_choice | checkbox | short_answer | paragraph | linear_scale",
+      "options": [],
+      "required": true,
+      "purpose": ""
+    }
+  ],
+  "sharing_message": "",
+  "google_forms_setup_steps": []
+}
 ## 7. LLM Client Design
 
 The LLM client should live in:
@@ -385,6 +409,108 @@ Use tabs:
 3. Policy Gaps
 4. Recommendations
 5. Executive Memo
+## Judge-Impressing Dashboard Features
+
+To make the hackathon demo more visual, credible, and understandable, the dashboard should include the following enhancements after the core pipeline is working.
+
+### 1. Pre-Loaded Demo Scenario
+
+The app must include a `Load Demo Scenario` button.
+
+This button should load:
+
+* `sample_data/attendance_policy.txt`
+* `sample_data/student_comments.csv`
+
+Purpose:
+
+This avoids wasting demo time on manual file uploads and ensures a smooth presentation.
+
+### 2. Visible Agent Pipeline View
+
+The UI should visually show the multi-agent workflow:
+
+Policy Extraction Agent → Public Sentiment Agent → Concern Clustering Agent → Gap Detection Agent → Recommendation Agent
+
+Optional:
+
+Survey Generator Agent
+
+Purpose:
+
+This helps judges understand that the project is a real multi-agent workflow, not a simple chatbot.
+
+### 3. Evidence Quotes
+
+Each concern cluster should include at least one actual quote from the uploaded comments.
+
+Example:
+
+Concern: Medical Exemptions
+Evidence Quote: “There should be a medical exemption process for students who are sick or hospitalized.”
+
+Purpose:
+
+This makes the report more credible and shows that recommendations are grounded in real feedback.
+
+### 4. Recommendation Priority Ranking
+
+Recommendations should be ranked using three levels:
+
+* Critical
+* Important
+* Nice-to-have
+
+Purpose:
+
+This helps decision-makers understand what should be fixed first.
+
+### 5. Lightweight RAG Visibility
+
+The Gap Detection Agent should explicitly compare:
+
+* public concern
+* policy text
+* policy design principle from local knowledge base
+
+Purpose:
+
+This allows the team to honestly describe the system as using lightweight RAG-augmented gap detection.
+
+### 6. Concern Frequency / Evidence Strength
+
+Instead of claiming uncertain AI confidence, the app should show evidence-based signals such as:
+
+* Mentioned in 8 out of 25 comments
+* Concern Frequency: 32%
+* Evidence Strength: High / Medium / Low
+
+Purpose:
+
+This is more defensible than saying “AI is 85% confident.”
+
+### 7. Downloadable Executive Memo
+
+The Executive Memo tab should include a download button.
+
+Suggested file name:
+
+`policy_consultation_memo.md`
+
+Purpose:
+
+This makes the output practical and useful for real decision-makers.
+
+### 8. Optional Admin vs Student Perspective
+
+If time remains, recommendations can be split into two columns:
+
+* What Admin Should Do
+* What Students Should Know
+
+Purpose:
+
+This improves real-world usability and makes the output easier to act on.
 
 ## 11. Error Handling
 
