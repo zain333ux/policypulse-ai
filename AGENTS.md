@@ -62,7 +62,25 @@ Do not build:
 - complex vector database
 - government API integrations
 - legal/medical/financial claims
+## Optional Bonus Feature: Feedback Survey Generator
 
+PolicyPulse AI may include a bonus feature for cases where feedback has not been collected yet.
+
+The app can generate a Google-Forms-ready survey template based on the uploaded policy.
+
+The MVP version should only generate:
+- survey title
+- survey description
+- policy-specific questions
+- question types
+- answer options
+- required/not required status
+- sharing message for students/citizens
+- manual Google Forms setup instructions
+
+Do not implement direct Google Forms API integration unless the core analysis pipeline is fully working.
+
+Direct Google Forms API integration, OAuth, Apps Script automation, and response fetching are future/stretch features.
 ## Agent Pipeline
 The project should use five logical agents:
 

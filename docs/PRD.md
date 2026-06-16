@@ -105,7 +105,24 @@ The app should generate:
 7. Suggested revised wording
 8. Public meeting questions
 9. Executive memo
+## Optional Bonus Feature: Feedback Survey Generator
 
+If an organization has not collected public or student feedback yet, PolicyPulse AI can generate a ready-to-use survey template based on the uploaded policy.
+
+This survey can be copied into Google Forms and shared through a link.
+
+The generated survey should include:
+- survey title
+- survey description
+- 6–8 policy-specific questions
+- question types such as multiple choice, paragraph, checkbox, and linear scale
+- answer options where needed
+- reason/purpose for each question
+- copy-ready sharing message
+
+For the hackathon MVP, the app will not automatically create a real Google Form. It will generate a Google-Forms-ready structure that the user can copy manually.
+
+Future versions may integrate directly with Google Forms API or Google Apps Script.
 ## 9. Multi-Agent Workflow
 
 The system uses five logical agents.
@@ -230,7 +247,9 @@ Do not build:
 * vector database
 * complex CrewAI setup
 * external government API integrations
-
+- direct Google Forms API integration unless time remains
+- OAuth setup for Google Forms
+- automatic response fetching from Google Forms
 ## 14. Success Criteria
 
 The MVP is successful if:
