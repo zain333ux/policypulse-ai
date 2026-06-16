@@ -125,7 +125,7 @@ For the hackathon MVP, the app will not automatically create a real Google Form.
 Future versions may integrate directly with Google Forms API or Google Apps Script.
 ## 9. Multi-Agent Workflow
 
-The system uses five logical agents.
+The system uses five core logical agents, with an optional survey generator agent.
 
 ### Agent 1: Policy Extraction Agent
 
