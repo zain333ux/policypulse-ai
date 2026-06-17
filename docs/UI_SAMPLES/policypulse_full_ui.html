@@ -1,0 +1,631 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0a0f1e;
+  --navy2:#0f1729;
+  --card:#111827cc;
+  --card2:#1e293b99;
+  --blue:#3b82f6;
+  --blue2:#60a5fa;
+  --teal:#14b8a6;
+  --green:#22c55e;
+  --amber:#f59e0b;
+  --red:#ef4444;
+  --border:rgba(255,255,255,0.08);
+  --border2:rgba(59,130,246,0.3);
+  --text:#f1f5f9;
+  --muted:#94a3b8;
+  --muted2:#64748b;
+}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--navy);color:var(--text);}
+
+.app-wrap{min-height:100vh;background:var(--navy);}
+
+.navbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 24px;
+  background:rgba(10,15,30,0.95);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:100;
+}
+.nav-logo{font-size:18px;font-weight:700;color:#fff;letter-spacing:-0.5px;}
+.nav-logo span{color:var(--blue2);}
+.nav-links{display:flex;gap:6px;}
+.nav-link{
+  padding:6px 14px;border-radius:8px;font-size:13px;
+  color:var(--muted);cursor:pointer;border:none;background:transparent;
+  transition:all 0.2s;
+}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,0.06);}
+.nav-link.active{color:#fff;background:rgba(59,130,246,0.15);border:1px solid var(--border2);}
+.nav-badge{
+  background:var(--blue);color:#fff;font-size:11px;
+  padding:5px 14px;border-radius:99px;font-weight:600;cursor:pointer;border:none;
+}
+
+.hero{
+  position:relative;overflow:hidden;
+  min-height:480px;
+  display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:4rem 2rem;
+}
+.hero-bg{
+  position:absolute;inset:0;z-index:0;
+  background-image:url('https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=1400&q=80');
+  background-size:cover;background-position:center;
+  filter:brightness(0.25);
+}
+.hero-overlay{
+  position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,rgba(10,15,30,0.3) 0%,rgba(10,15,30,0.85) 100%);
+}
+.hero-content{position:relative;z-index:2;max-width:640px;}
+.hero-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(59,130,246,0.15);
+  border:1px solid rgba(59,130,246,0.4);
+  color:#93c5fd;font-size:12px;padding:5px 14px;
+  border-radius:99px;margin-bottom:1.5rem;letter-spacing:0.5px;
+}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.hero h1{font-size:42px;font-weight:800;line-height:1.15;color:#fff;margin-bottom:1rem;letter-spacing:-1px;}
+.hero h1 em{font-style:normal;color:var(--blue2);}
+.hero p{font-size:16px;color:#94a3b8;line-height:1.7;margin-bottom:2rem;}
+.hero-cta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.btn-solid{
+  background:var(--blue);color:#fff;border:none;
+  padding:11px 26px;border-radius:10px;font-size:14px;font-weight:600;
+  cursor:pointer;transition:all 0.2s;
+}
+.btn-solid:hover{background:#2563eb;transform:translateY(-1px);}
+.btn-ghost{
+  background:rgba(255,255,255,0.07);color:#fff;
+  border:1px solid rgba(255,255,255,0.15);
+  padding:11px 26px;border-radius:10px;font-size:14px;
+  cursor:pointer;transition:all 0.2s;
+}
+.btn-ghost:hover{background:rgba(255,255,255,0.12);}
+.hero-stats{
+  display:flex;gap:2rem;justify-content:center;margin-top:2.5rem;
+  padding-top:2rem;border-top:1px solid rgba(255,255,255,0.1);
+}
+.hstat-num{font-size:26px;font-weight:800;color:var(--blue2);}
+.hstat-label{font-size:12px;color:var(--muted);margin-top:2px;}
+
+.main{padding:2rem 1.5rem;max-width:900px;margin:0 auto;}
+
+.section-head{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:1.2rem;
+}
+.section-icon{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+}
+.icon-blue{background:rgba(59,130,246,0.15);color:var(--blue2);}
+.icon-teal{background:rgba(20,184,166,0.15);color:var(--teal);}
+.icon-amber{background:rgba(245,158,11,0.15);color:var(--amber);}
+.icon-green{background:rgba(34,197,94,0.15);color:var(--green);}
+.section-title{font-size:15px;font-weight:700;color:#fff;}
+.section-sub{font-size:12px;color:var(--muted);margin-top:1px;}
+
+.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem;}
+.upload-card{
+  background:var(--card);
+  border:1.5px dashed rgba(255,255,255,0.12);
+  border-radius:14px;padding:1.5rem 1rem;
+  text-align:center;cursor:pointer;transition:all 0.25s;
+}
+.upload-card:hover{border-color:var(--blue);background:rgba(59,130,246,0.06);}
+.upload-card.active{border-color:var(--green);border-style:solid;background:rgba(34,197,94,0.06);}
+.uc-icon{
+  width:48px;height:48px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 12px;font-size:22px;
+}
+.uc-title{font-size:14px;font-weight:600;color:#fff;margin-bottom:4px;}
+.uc-sub{font-size:12px;color:var(--muted);}
+.uc-badge{
+  display:inline-block;margin-top:10px;font-size:11px;
+  padding:3px 10px;border-radius:99px;font-weight:600;
+}
+.badge-blue{background:rgba(59,130,246,0.2);color:#93c5fd;}
+.badge-green{background:rgba(34,197,94,0.2);color:#86efac;}
+.badge-amber{background:rgba(245,158,11,0.2);color:#fcd34d;}
+.badge-red{background:rgba(239,68,68,0.2);color:#fca5a5;}
+.badge-teal{background:rgba(20,184,166,0.2);color:#5eead4;}
+
+.analyze-btn{
+  width:100%;padding:14px;border-radius:12px;
+  background:linear-gradient(135deg,#2563eb,#0891b2);
+  color:#fff;font-size:15px;font-weight:700;
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-bottom:2rem;transition:all 0.2s;
+}
+.analyze-btn:hover{opacity:0.9;transform:translateY(-1px);}
+.analyze-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+
+.progress-section{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:1.25rem;margin-bottom:1.5rem;
+}
+.progress-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.progress-text{font-size:13px;color:var(--muted);}
+.progress-pct{font-size:13px;font-weight:700;color:var(--blue2);}
+.progress-track{height:6px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#3b82f6,#14b8a6);transition:width 0.5s ease;}
+.agents-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+.agent-chip{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;
+  border:1px solid transparent;
+}
+.agent-done{background:rgba(34,197,94,0.1);color:#86efac;border-color:rgba(34,197,94,0.2);}
+.agent-run{background:rgba(59,130,246,0.15);color:#93c5fd;border-color:rgba(59,130,246,0.3);}
+.agent-wait{background:rgba(255,255,255,0.04);color:var(--muted2);border-color:var(--border);}
+.spin{display:inline-block;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.5rem;}
+.metric{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:1rem;text-align:center;
+}
+.metric-val{font-size:28px;font-weight:800;margin-bottom:4px;}
+.metric-lbl{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:0.5px;}
+.metric-sub{font-size:11px;margin-top:4px;font-weight:600;}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem;}
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:1.25rem;
+}
+
+.sentiment-wrap{margin-top:8px;}
+.sent-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.sent-label{font-size:12px;color:var(--muted);width:64px;flex-shrink:0;}
+.sent-track{flex:1;height:8px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;}
+.sent-fill{height:100%;border-radius:99px;}
+.sent-pct{font-size:12px;font-weight:700;width:32px;text-align:right;flex-shrink:0;}
+
+.concerns-list{margin-top:8px;}
+.concern-row{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.concern-row:last-child{border-bottom:none;}
+.crank{
+  width:24px;height:24px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;flex-shrink:0;
+}
+.concern-text{font-size:12px;color:#e2e8f0;flex:1;line-height:1.4;}
+.concern-bar-wrap{width:60px;height:5px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;}
+.concern-bar{height:100%;border-radius:99px;}
+
+.map-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;margin-bottom:1.5rem;position:relative;
+}
+.map-img{
+  width:100%;height:180px;object-fit:cover;
+  background-image:url('https://images.unsplash.com/photo-1524661135-423995f22d0b?w=900&q=80');
+  background-size:cover;background-position:center;
+  filter:brightness(0.5) saturate(0.7);
+}
+.map-overlay{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  background:linear-gradient(180deg,transparent 40%,rgba(10,15,30,0.95) 100%);
+  display:flex;flex-direction:column;justify-content:flex-end;padding:1.25rem;
+}
+.map-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;}
+.map-sub{font-size:12px;color:var(--muted);}
+.map-dots{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.mdot{
+  padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;
+}
+
+.memo-card{
+  background:#080d1a;border:1px solid rgba(59,130,246,0.2);
+  border-radius:14px;padding:1.5rem;margin-bottom:1.5rem;
+  position:relative;overflow:hidden;
+}
+.memo-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,#3b82f6,#14b8a6,#a855f7);
+}
+.memo-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
+.memo-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.memo-actions{display:flex;gap:6px;}
+.memo-action-btn{
+  padding:5px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:none;
+}
+.memo-text{font-size:13px;color:#cbd5e1;line-height:1.8;}
+.memo-highlight{color:var(--blue2);font-weight:700;}
+.memo-tag{
+  display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;
+  margin:0 2px;
+}
+
+.questions-list{margin-top:8px;}
+.q-item{
+  display:flex;gap:10px;align-items:flex-start;
+  padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.q-item:last-child{border-bottom:none;}
+.q-num{
+  width:22px;height:22px;border-radius:6px;
+  background:rgba(59,130,246,0.15);color:#93c5fd;
+  font-size:11px;font-weight:800;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;margin-top:1px;
+}
+.q-text{font-size:12px;color:#cbd5e1;line-height:1.5;}
+
+.footer-bar{
+  background:rgba(10,15,30,0.98);border-top:1px solid var(--border);
+  padding:16px 24px;display:flex;justify-content:space-between;align-items:center;
+  margin-top:2rem;
+}
+.footer-logo{font-size:14px;font-weight:700;color:#fff;}
+.footer-logo span{color:var(--blue2);}
+.footer-text{font-size:12px;color:var(--muted2);}
+.footer-pills{display:flex;gap:6px;}
+</style>
+
+<h2 class="sr-only">PolicyPulse AI — full interactive UI with hero, upload, analysis dashboard, sentiment, concerns, executive memo, and public meeting questions</h2>
+
+<div class="app-wrap">
+
+<div class="navbar">
+  <div class="nav-logo">Policy<span>Pulse</span> AI</div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showSection('upload')">Upload</button>
+    <button class="nav-link" onclick="showSection('dashboard')">Dashboard</button>
+    <button class="nav-link" onclick="showSection('memo')">Memo</button>
+  </div>
+  <button class="nav-badge">Hackathon Build</button>
+</div>
+
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-pill">
+      <span class="live-dot"></span>
+      5 AI Agents · Real-time Analysis
+    </div>
+    <h1>Turn Public Feedback<br>Into <em>Policy Action</em></h1>
+    <p>Upload any policy document and public comments. Our multi-agent AI extracts insights, measures sentiment, finds gaps, and writes executive memos — in under 60 seconds.</p>
+    <div class="hero-cta">
+      <button class="btn-solid" onclick="scrollToUpload()">
+        <i class="ti ti-upload" aria-hidden="true"></i> Start Analysis
+      </button>
+      <button class="btn-ghost" onclick="runDemo()">
+        <i class="ti ti-player-play" aria-hidden="true"></i> See Live Demo
+      </button>
+    </div>
+    <div class="hero-stats">
+      <div><div class="hstat-num">5</div><div class="hstat-label">AI Agents</div></div>
+      <div><div class="hstat-num">&lt;60s</div><div class="hstat-label">Analysis Time</div></div>
+      <div><div class="hstat-num">PDF/CSV</div><div class="hstat-label">File Types</div></div>
+      <div><div class="hstat-num">100%</div><div class="hstat-label">Open Source</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<div id="section-upload">
+  <div class="section-head">
+    <div class="section-icon icon-blue"><i class="ti ti-upload" aria-hidden="true"></i></div>
+    <div><div class="section-title">Upload your documents</div><div class="section-sub">Policy document + public comments required</div></div>
+  </div>
+
+  <div class="upload-grid">
+    <div class="upload-card" id="card-policy" onclick="toggleUpload('policy')">
+      <div class="uc-icon icon-blue"><i class="ti ti-file-text" aria-hidden="true"></i></div>
+      <div class="uc-title">Policy Document</div>
+      <div class="uc-sub">Attendance, grading, or any civic policy</div>
+      <div class="uc-badge badge-blue">PDF · TXT · DOCX</div>
+    </div>
+    <div class="upload-card" id="card-comments" onclick="toggleUpload('comments')">
+      <div class="uc-icon icon-teal"><i class="ti ti-message-dots" aria-hidden="true"></i></div>
+      <div class="uc-title">Public Comments</div>
+      <div class="uc-sub">Student, parent, or citizen feedback</div>
+      <div class="uc-badge badge-teal">CSV · TXT</div>
+    </div>
+  </div>
+
+  <button class="analyze-btn" id="analyze-btn" onclick="runAnalysis()">
+    <i class="ti ti-brain" aria-hidden="true"></i>
+    Analyze with AI Agents
+  </button>
+
+  <div class="progress-section" id="progress-wrap" style="display:none;">
+    <div class="progress-label">
+      <span class="progress-text" id="progress-text">Initializing agents...</span>
+      <span class="progress-pct" id="progress-pct">0%</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <div class="agents-row" id="agents-row">
+      <div class="agent-chip agent-wait" id="agent-0"><i class="ti ti-file-search" aria-hidden="true"></i> Policy Parser</div>
+      <div class="agent-chip agent-wait" id="agent-1"><i class="ti ti-mood-smile" aria-hidden="true"></i> Sentiment</div>
+      <div class="agent-chip agent-wait" id="agent-2"><i class="ti ti-chart-bubble" aria-hidden="true"></i> Clustering</div>
+      <div class="agent-chip agent-wait" id="agent-3"><i class="ti ti-git-compare" aria-hidden="true"></i> Gap Finder</div>
+      <div class="agent-chip agent-wait" id="agent-4"><i class="ti ti-writing" aria-hidden="true"></i> Memo Writer</div>
+    </div>
+  </div>
+</div>
+
+<div id="section-dashboard" style="display:none;">
+  <div class="section-head" style="margin-top:1rem;">
+    <div class="section-icon icon-green"><i class="ti ti-chart-bar" aria-hidden="true"></i></div>
+    <div><div class="section-title">Analysis Dashboard</div><div class="section-sub">Student Attendance Policy 2025 · 1,284 comments</div></div>
+  </div>
+
+  <div class="metrics-grid">
+    <div class="metric">
+      <div class="metric-val" style="color:var(--blue2);">1,284</div>
+      <div class="metric-lbl">Total Comments</div>
+      <div class="metric-sub" style="color:var(--green);">↑ High engagement</div>
+    </div>
+    <div class="metric">
+      <div class="metric-val" style="color:var(--green);">68%</div>
+      <div class="metric-lbl">Support Rate</div>
+      <div class="metric-sub" style="color:var(--green);">Strong positive</div>
+    </div>
+    <div class="metric">
+      <div class="metric-val" style="color:var(--red);">19%</div>
+      <div class="metric-lbl">Opposition</div>
+      <div class="metric-sub" style="color:var(--amber);">Key concerns found</div>
+    </div>
+    <div class="metric">
+      <div class="metric-val" style="color:var(--amber);">7</div>
+      <div class="metric-lbl">Policy Gaps</div>
+      <div class="metric-sub" style="color:var(--amber);">Needs revision</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="section-head" style="margin-bottom:0.75rem;">
+        <div class="section-icon icon-teal" style="width:26px;height:26px;font-size:13px;"><i class="ti ti-mood-smile" aria-hidden="true"></i></div>
+        <div class="section-title" style="font-size:13px;">Sentiment breakdown</div>
+      </div>
+      <div class="sentiment-wrap">
+        <div class="sent-row">
+          <div class="sent-label" style="color:#86efac;">Support</div>
+          <div class="sent-track"><div class="sent-fill" style="width:68%;background:#22c55e;"></div></div>
+          <div class="sent-pct" style="color:#86efac;">68%</div>
+        </div>
+        <div class="sent-row">
+          <div class="sent-label" style="color:#94a3b8;">Neutral</div>
+          <div class="sent-track"><div class="sent-fill" style="width:13%;background:#64748b;"></div></div>
+          <div class="sent-pct" style="color:#94a3b8;">13%</div>
+        </div>
+        <div class="sent-row">
+          <div class="sent-label" style="color:#fca5a5;">Oppose</div>
+          <div class="sent-track"><div class="sent-fill" style="width:19%;background:#ef4444;"></div></div>
+          <div class="sent-pct" style="color:#fca5a5;">19%</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:600;">CONCERN CLUSTERS</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;">
+          <span class="uc-badge badge-amber">Timeline clarity</span>
+          <span class="uc-badge badge-red">Disability access</span>
+          <span class="uc-badge badge-blue">Appeal process</span>
+          <span class="uc-badge badge-teal">Parent comms</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-head" style="margin-bottom:0.75rem;">
+        <div class="section-icon icon-amber" style="width:26px;height:26px;font-size:13px;"><i class="ti ti-alert-triangle" aria-hidden="true"></i></div>
+        <div class="section-title" style="font-size:13px;">Top concerns</div>
+      </div>
+      <div class="concerns-list">
+        <div class="concern-row">
+          <div class="crank" style="background:rgba(245,158,11,0.15);color:#fcd34d;">1</div>
+          <div class="concern-text">No implementation timeline clarity</div>
+          <div class="concern-bar-wrap"><div class="concern-bar" style="width:90%;background:#f59e0b;"></div></div>
+        </div>
+        <div class="concern-row">
+          <div class="crank" style="background:rgba(239,68,68,0.15);color:#fca5a5;">2</div>
+          <div class="concern-text">Missing disability accommodations</div>
+          <div class="concern-bar-wrap"><div class="concern-bar" style="width:75%;background:#ef4444;"></div></div>
+        </div>
+        <div class="concern-row">
+          <div class="crank" style="background:rgba(59,130,246,0.15);color:#93c5fd;">3</div>
+          <div class="concern-text">Unclear appeal procedures</div>
+          <div class="concern-bar-wrap"><div class="concern-bar" style="width:55%;background:#3b82f6;"></div></div>
+        </div>
+        <div class="concern-row">
+          <div class="crank" style="background:rgba(20,184,166,0.15);color:#5eead4;">4</div>
+          <div class="concern-text">Insufficient parent notification</div>
+          <div class="concern-bar-wrap"><div class="concern-bar" style="width:40%;background:#14b8a6;"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="map-card">
+    <div class="map-img"></div>
+    <div class="map-overlay">
+      <div class="map-title">Geographic distribution of comments</div>
+      <div class="map-sub">Comments received from 14 districts across the region</div>
+      <div class="map-dots">
+        <span class="mdot" style="background:rgba(34,197,94,0.2);color:#86efac;">North District · 312</span>
+        <span class="mdot" style="background:rgba(59,130,246,0.2);color:#93c5fd;">Central · 287</span>
+        <span class="mdot" style="background:rgba(245,158,11,0.2);color:#fcd34d;">East Zone · 198</span>
+        <span class="mdot" style="background:rgba(168,85,247,0.2);color:#d8b4fe;">West Side · 174</span>
+        <span class="mdot" style="background:rgba(239,68,68,0.2);color:#fca5a5;">South · 313</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="section-memo" style="display:none;">
+  <div class="memo-card">
+    <div class="memo-header">
+      <div class="memo-label">Executive Memo · AI Generated</div>
+      <div class="memo-actions">
+        <button class="memo-action-btn" style="background:rgba(59,130,246,0.15);color:#93c5fd;border:1px solid rgba(59,130,246,0.3);">
+          <i class="ti ti-copy" aria-hidden="true"></i> Copy
+        </button>
+        <button class="memo-action-btn" style="background:rgba(34,197,94,0.15);color:#86efac;border:1px solid rgba(34,197,94,0.3);">
+          <i class="ti ti-download" aria-hidden="true"></i> Export PDF
+        </button>
+      </div>
+    </div>
+    <div class="memo-text">
+      <strong style="color:#fff;display:block;margin-bottom:8px;">RE: Student Attendance Policy 2025 — Public Consultation Results</strong>
+      The proposed <span class="memo-highlight">Student Attendance Policy 2025</span> received
+      <span class="memo-tag" style="background:rgba(34,197,94,0.15);color:#86efac;">Strong Support (68%)</span>
+      across 1,284 public comments, indicating broad community alignment with the policy's core objectives.
+      <br><br>
+      However, analysis reveals <span class="memo-highlight">7 critical gaps</span> requiring immediate attention before implementation.
+      The most pressing concern — raised by <span class="memo-tag" style="background:rgba(245,158,11,0.15);color:#fcd34d;">34% of respondents</span> — is the
+      absence of a clear implementation timeline, which risks eroding public trust if not addressed.
+      <br><br>
+      Disability accommodations represent a significant equity gap, with
+      <span class="memo-tag" style="background:rgba(239,68,68,0.15);color:#fca5a5;">28% of comments</span>
+      citing the lack of explicit provisions as a legal and ethical risk.
+      We recommend <span class="memo-highlight">3 immediate revisions</span> and a 30-day public comment extension
+      before final adoption.
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:1.5rem;">
+    <div class="section-head" style="margin-bottom:0.75rem;">
+      <div class="section-icon icon-blue" style="width:26px;height:26px;font-size:13px;"><i class="ti ti-microphone" aria-hidden="true"></i></div>
+      <div class="section-title" style="font-size:13px;">Suggested public meeting questions</div>
+    </div>
+    <div class="questions-list">
+      <div class="q-item"><div class="q-num">1</div><div class="q-text">How does the district plan to communicate attendance policy changes to families who speak languages other than English?</div></div>
+      <div class="q-item"><div class="q-num">2</div><div class="q-text">What specific accommodations will be made for students with chronic illness or documented disabilities?</div></div>
+      <div class="q-item"><div class="q-num">3</div><div class="q-text">Can you walk us through the complete appeals process and who has final authority on exemption decisions?</div></div>
+      <div class="q-item"><div class="q-num">4</div><div class="q-text">What is the phased implementation timeline and how will schools receive training before enforcement begins?</div></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="footer-bar">
+  <div class="footer-logo">Policy<span>Pulse</span> AI</div>
+  <div class="footer-text">Built for Hackathon 2025 · Python + Streamlit + OpenAI</div>
+  <div class="footer-pills">
+    <span class="uc-badge badge-blue">v1.0</span>
+    <span class="uc-badge badge-green">Live</span>
+  </div>
+</div>
+
+</div>
+
+<script>
+var policyUploaded=false,commentsUploaded=false;
+
+function showSection(s){
+  document.getElementById('section-upload').style.display='none';
+  document.getElementById('section-dashboard').style.display='none';
+  document.getElementById('section-memo').style.display='none';
+  document.querySelectorAll('.nav-link').forEach(function(el){el.classList.remove('active');});
+  if(s==='upload'){document.getElementById('section-upload').style.display='block';}
+  else if(s==='dashboard'){document.getElementById('section-dashboard').style.display='block';}
+  else if(s==='memo'){document.getElementById('section-memo').style.display='block';}
+  event.target.classList.add('active');
+}
+
+function scrollToUpload(){
+  document.getElementById('section-upload').scrollIntoView({behavior:'smooth'});
+}
+
+function toggleUpload(type){
+  if(type==='policy'){
+    policyUploaded=!policyUploaded;
+    var c=document.getElementById('card-policy');
+    if(policyUploaded){
+      c.classList.add('active');
+      c.querySelector('.uc-badge').textContent='attendance_policy.pdf ✓';
+      c.querySelector('.uc-badge').className='uc-badge badge-green';
+    } else {
+      c.classList.remove('active');
+      c.querySelector('.uc-badge').textContent='PDF · TXT · DOCX';
+      c.querySelector('.uc-badge').className='uc-badge badge-blue';
+    }
+  } else {
+    commentsUploaded=!commentsUploaded;
+    var c2=document.getElementById('card-comments');
+    if(commentsUploaded){
+      c2.classList.add('active');
+      c2.querySelector('.uc-badge').textContent='student_comments.csv ✓';
+      c2.querySelector('.uc-badge').className='uc-badge badge-green';
+    } else {
+      c2.classList.remove('active');
+      c2.querySelector('.uc-badge').textContent='CSV · TXT';
+      c2.querySelector('.uc-badge').className='uc-badge badge-teal';
+    }
+  }
+}
+
+function runDemo(){
+  policyUploaded=true;commentsUploaded=true;
+  var cp=document.getElementById('card-policy');
+  cp.classList.add('active');
+  cp.querySelector('.uc-badge').textContent='attendance_policy.pdf ✓';
+  cp.querySelector('.uc-badge').className='uc-badge badge-green';
+  var cc=document.getElementById('card-comments');
+  cc.classList.add('active');
+  cc.querySelector('.uc-badge').textContent='student_comments.csv ✓';
+  cc.querySelector('.uc-badge').className='uc-badge badge-green';
+  setTimeout(function(){runAnalysis();},400);
+}
+
+function runAnalysis(){
+  document.getElementById('progress-wrap').style.display='block';
+  document.getElementById('analyze-btn').disabled=true;
+  var agents=[
+    {id:'agent-0',label:'Policy Parser',done:'Policy parsed'},
+    {id:'agent-1',label:'Sentiment',done:'Sentiment scored'},
+    {id:'agent-2',label:'Clustering',done:'Clusters found'},
+    {id:'agent-3',label:'Gap Finder',done:'7 gaps detected'},
+    {id:'agent-4',label:'Memo Writer',done:'Memo ready'}
+  ];
+  var msgs=['Parsing policy document...','Analyzing sentiment across 1,284 comments...','Clustering public concerns...','Detecting policy gaps...','Writing executive memo...','Analysis complete!'];
+  var steps=[10,25,50,70,88,100];
+  var i=0;
+  function step(){
+    if(i>0){
+      var prev=document.getElementById(agents[i-1].id);
+      prev.className='agent-chip agent-done';
+      prev.innerHTML='<i class="ti ti-check" aria-hidden="true"></i> '+agents[i-1].done;
+    }
+    if(i<agents.length){
+      var cur=document.getElementById(agents[i].id);
+      cur.className='agent-chip agent-run';
+      cur.innerHTML='<span class="spin">⟳</span> '+agents[i].label;
+    }
+    document.getElementById('progress-text').textContent=msgs[i]||'Done!';
+    document.getElementById('progress-pct').textContent=steps[i]+'%';
+    document.getElementById('progress-fill').style.width=steps[i]+'%';
+    i++;
+    if(i<=agents.length){setTimeout(step,900);}
+    else{
+      setTimeout(function(){
+        document.getElementById('section-upload').style.display='none';
+        document.getElementById('section-dashboard').style.display='block';
+        document.getElementById('section-memo').style.display='block';
+        document.querySelectorAll('.nav-link').forEach(function(el){el.classList.remove('active');});
+        document.querySelectorAll('.nav-link')[1].classList.add('active');
+      },600);
+    }
+  }
+  step();
+}
+</script>

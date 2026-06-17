@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PolicyPulse — Public comment analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ─── design tokens ──────────────────────────────────── */
+:root {
+  --navy:       #16233B;
+  --navy-mid:   #1E304F;
+  --cream:      #F6F1E4;
+  --card:       #FBF8EF;
+  --brass:      #B8893F;
+  --brass-lt:   #C99E50;
+  --brass-dk:   #8A6830;
+  --sage:       #3F6B4F;
+  --clay:       #9C3F3A;
+  --muted:      #8A8270;
+  --rule:       #DDD3BD;
+  --serif:      'Lora', Georgia, serif;
+  --sans:       'Source Sans 3', Inter, system-ui, sans-serif;
+  --r-sm:       4px;
+  --r-md:       8px;
+  --r-lg:       14px;
+  --ease:       0.2s ease;
+}
+
+/* ─── reset ────────────────────────────────────────────── */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body {
+  font-family: var(--sans);
+  background: var(--cream);
+  color: var(--navy);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+button { font-family: var(--sans); cursor:pointer; border:none; }
+h1,h2,h3,h4 { font-family: var(--serif); font-weight:600; line-height:1.25; }
+p { margin:0; }
+
+/* ─── screens ──────────────────────────────────────────── */
+.screen { display:none; min-height:100vh; }
+.screen.active { display:block; }
+
+/* ─── shared components ─────────────────────────────────── */
+.pp-wordmark {
+  display:flex; align-items:center; gap:10px; text-decoration:none;
+}
+.pp-mark {
+  width:30px; height:30px; background:var(--brass); border-radius:3px;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.pp-mark svg { width:17px; height:17px; }
+.pp-name {
+  font-family: var(--serif); font-size:17px; font-weight:700;
+  color: white; letter-spacing:0.01em;
+}
+.pp-name em { color:var(--brass); font-style:normal; }
+
+.btn-primary {
+  display:inline-flex; align-items:center; gap:8px;
+  background:var(--brass); color:white;
+  font-family:var(--sans); font-size:14px; font-weight:600;
+  padding:12px 26px; border-radius:var(--r-sm); border:none;
+  letter-spacing:0.01em; cursor:pointer;
+  transition: background var(--ease), transform var(--ease), box-shadow var(--ease);
+}
+.btn-primary:hover {
+  background: var(--brass-lt);
+  transform:translateY(-1px);
+  box-shadow:0 6px 20px rgba(184,137,63,.3);
+}
+.btn-primary:active { transform:translateY(0); }
+.btn-primary:disabled {
+  opacity:.35; cursor:not-allowed;
+  transform:none; box-shadow:none; background:var(--brass);
+}
+
+.btn-text {
+  background:none; border:none; font-family:var(--sans);
+  font-size:13px; text-decoration:underline; text-underline-offset:3px;
+  cursor:pointer; padding:0;
+}
+
+.nav-bar {
+  background:var(--navy);
+  padding:18px 48px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.back-link {
+  font-size:13px; color:rgba(255,255,255,.45);
+  background:none; border:none; cursor:pointer;
+  font-family:var(--sans); display:flex; align-items:center; gap:6px;
+  transition: color var(--ease);
+}
+.back-link:hover { color:rgba(255,255,255,.8); }
+
+
+/* ══════════════════════════════════════════════════════
+   S1  LANDING
+══════════════════════════════════════════════════════ */
+#s-landing {
+  background-color: #12203A;
+  /* Council chamber atmosphere: architectural depth, warm light source */
+  background-image:
+    radial-gradient(ellipse 50% 70% at 72% 30%, rgba(184,137,63,.13) 0%, transparent 65%),
+    radial-gradient(ellipse 80% 50% at 20% 90%, rgba(22,35,59,.9) 0%, transparent 60%),
+    linear-gradient(155deg, #1C2E48 0%, #111E30 55%, #0C1724 100%);
+  position:relative; overflow:hidden;
+}
+
+/* Faint ruled lines — desks/balconies */
+#s-landing::before {
+  content:'';
+  position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(0deg,
+      transparent, transparent 79px,
+      rgba(255,255,255,.018) 80px
+    ),
+    repeating-linear-gradient(90deg,
+      transparent, transparent 159px,
+      rgba(255,255,255,.012) 160px
+    );
+  pointer-events:none;
+}
+
+/* Distant podium highlight */
+#s-landing::after {
+  content:'';
+  position:absolute;
+  bottom:-5%; right:5%;
+  width:55%; height:70%;
+  background: radial-gradient(ellipse, rgba(184,137,63,.09) 0%, transparent 65%);
+  pointer-events:none;
+}
+
+.landing-wrap {
+  position:relative; z-index:1;
+  min-height:100vh;
+  display:flex; flex-direction:column;
+  padding:36px 56px 52px;
+  max-width:1280px;
+}
+
+.landing-nav {
+  display:flex; align-items:center; justify-content:space-between;
+}
+.landing-nav-links {
+  display:flex; gap:28px; align-items:center;
+}
+.landing-nav-links a {
+  font-size:13px; color:rgba(255,255,255,.45);
+  text-decoration:none; transition:color var(--ease);
+}
+.landing-nav-links a:hover { color:rgba(255,255,255,.8); }
+
+.landing-hero {
+  max-width:700px;
+  margin-top:auto;
+  padding-top:100px;
+  padding-bottom:20px;
+}
+
+.eyebrow {
+  font-size:11px; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--brass);
+  margin-bottom:20px; display:block;
+}
+
+.landing-h1 {
+  font-family: var(--serif);
+  font-size: clamp(40px, 5.5vw, 66px);
+  font-weight:700; line-height:1.08;
+  color:white; margin-bottom:22px;
+}
+.landing-h1 .brass {
+  color:var(--brass); font-style:italic;
+}
+
+.landing-sub {
+  font-size:17px; line-height:1.7;
+  color:rgba(255,255,255,.65); font-weight:300;
+  max-width:520px; margin-bottom:40px;
+}
+
+.landing-cta {
+  display:flex; align-items:center; gap:24px;
+  flex-wrap:wrap; margin-bottom:60px;
+}
+.btn-ghost-landing {
+  background:none; border:none;
+  font-size:14px; color:rgba(255,255,255,.5);
+  text-decoration:underline; text-underline-offset:3px;
+  cursor:pointer; font-family:var(--sans);
+  transition:color var(--ease);
+}
+.btn-ghost-landing:hover { color:white; }
+
+.landing-chips {
+  display:flex; gap:10px; flex-wrap:wrap;
+}
+.chip {
+  font-size:11px; font-weight:600; letter-spacing:.06em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.6);
+  border:1px solid rgba(255,255,255,.2);
+  padding:5px 13px; border-radius:2px;
+}
+
+/* Vertical rule on right side */
+.landing-aside {
+  position:absolute;
+  right:56px; bottom:52px;
+  writing-mode:vertical-rl;
+  font-size:10px; letter-spacing:.12em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.15);
+  font-weight:600;
+}
+
+
+/* ══════════════════════════════════════════════════════
+   S2  UPLOAD
+══════════════════════════════════════════════════════ */
+.upload-body {
+  max-width:880px; margin:0 auto;
+  padding:60px 48px 80px;
+}
+.upload-body h2 {
+  font-size:28px; margin-bottom:6px;
+}
+.upload-body > p.lead {
+  font-size:15px; color:var(--muted); margin-bottom:44px;
+}
+
+.tray-grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:20px; margin-bottom:28px;
+}
+
+/* Folder-tab card */
+.tray {
+  position:relative;
+  margin-top:28px; /* space for tab */
+  background:var(--card);
+  border:1.5px dashed var(--rule);
+  border-radius:0 var(--r-md) var(--r-md) var(--r-md);
+  padding:32px 28px 28px;
+  cursor:pointer;
+  transition: border-color var(--ease), background var(--ease), box-shadow var(--ease);
+}
+.tray:hover {
+  border-color:var(--brass);
+  border-style:solid;
+  box-shadow: 0 4px 16px rgba(184,137,63,.1);
+}
+.tray.filled {
+  border-color:var(--brass);
+  border-style:solid;
+  background:white;
+}
+
+/* The tab */
+.tray-label {
+  position:absolute;
+  top:-28px; left:0;
+  background:var(--brass);
+  color:white;
+  font-size:10px; font-weight:700; letter-spacing:.1em;
+  text-transform:uppercase;
+  padding:5px 14px;
+  border-radius:3px 3px 0 0;
+  white-space:nowrap;
+  transition:background var(--ease);
+}
+
+.tray-icon {
+  width:42px; height:42px;
+  background:rgba(184,137,63,.08);
+  border-radius:var(--r-sm);
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:14px;
+}
+.tray-icon svg {
+  width:22px; height:22px;
+  stroke:var(--brass); fill:none; stroke-width:1.5;
+  stroke-linecap:round; stroke-linejoin:round;
+}
+.tray h3 {
+  font-family:var(--serif); font-size:15px; font-weight:600;
+  margin-bottom:4px;
+}
+.tray-types {
+  font-size:12px; color:var(--muted); margin-bottom:20px;
+}
+
+.tray-placeholder p {
+  font-size:14px; color:var(--muted); margin-bottom:10px;
+}
+.btn-browse {
+  display:inline-flex; background:white; border:1px solid var(--rule);
+  border-radius:var(--r-sm); padding:7px 16px;
+  font-size:13px; font-weight:500; color:var(--navy);
+  cursor:pointer; font-family:var(--sans);
+  transition:border-color var(--ease), background var(--ease);
+}
+.btn-browse:hover { border-color:var(--brass); background:rgba(184,137,63,.04); }
+
+.file-chip {
+  display:none; align-items:center; gap:8px;
+  background:rgba(63,107,79,.07);
+  border:1px solid rgba(63,107,79,.25);
+  border-radius:var(--r-sm); padding:9px 13px;
+  font-size:13px; color:var(--sage); font-weight:600;
+}
+.file-chip svg { width:14px; height:14px; stroke:var(--sage); fill:none; stroke-width:2.5; flex-shrink:0; }
+.tray.filled .tray-placeholder { display:none; }
+.tray.filled .file-chip { display:flex; }
+
+.upload-actions {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px; flex-wrap:wrap; margin-bottom:20px;
+}
+.upload-trust {
+  font-size:12px; color:var(--muted); font-style:italic;
+  border-top:1px solid var(--rule); padding-top:18px;
+}
+.upload-trust svg {
+  width:12px; height:12px; stroke:var(--muted); fill:none;
+  stroke-width:2; vertical-align:-1px; margin-right:5px;
+}
+
+
+/* ══════════════════════════════════════════════════════
+   S3  PROCESSING
+══════════════════════════════════════════════════════ */
+.proc-body {
+  max-width:620px; margin:0 auto;
+  padding:72px 48px 80px;
+}
+.proc-body h2 { font-size:26px; margin-bottom:4px; }
+.proc-sub { font-size:14px; color:var(--muted); margin-bottom:40px; }
+
+/* Progress bar */
+.proc-track {
+  height:2px; background:var(--rule);
+  border-radius:1px; margin-bottom:10px; overflow:hidden;
+}
+.proc-fill {
+  height:100%; background:var(--brass);
+  border-radius:1px; width:0%;
+  transition:width .55s ease;
+}
+.proc-count {
+  font-size:12px; font-weight:600; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--brass);
+  margin-bottom:40px; display:block;
+}
+
+/* Steps */
+.proc-steps { display:flex; flex-direction:column; }
+
+.proc-step {
+  display:flex; align-items:flex-start; gap:18px;
+  padding:18px 0; border-bottom:1px solid var(--rule);
+  opacity:.3; transition:opacity .35s ease;
+}
+.proc-step:last-child { border-bottom:none; }
+.proc-step.active,
+.proc-step.done { opacity:1; }
+
+.stamp {
+  width:36px; height:36px; flex-shrink:0;
+  border:1.5px solid var(--rule);
+  border-radius:var(--r-sm); background:white;
+  display:flex; align-items:center; justify-content:center;
+  position:relative; transition:border-color .25s, background .25s;
+}
+.proc-step.active .stamp { border-color:var(--brass); }
+.proc-step.done  .stamp { border-color:var(--brass); background:var(--brass); }
+
+/* Pulse dot */
+.stamp-pulse {
+  width:6px; height:6px; border-radius:50%;
+  background:var(--brass);
+  animation:pulse 1.1s ease-in-out infinite;
+}
+.proc-step.done  .stamp-pulse { display:none; }
+
+/* Check mark — settle-and-thud */
+.stamp-check {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; transform:scale(2.4) rotate(-8deg);
+}
+.proc-step.done .stamp-check {
+  opacity:1; transform:scale(1) rotate(0deg);
+  transition:opacity .12s ease, transform .28s cubic-bezier(.175,.885,.32,1.4);
+}
+.stamp-check svg {
+  width:17px; height:17px;
+  stroke:white; fill:none; stroke-width:2.5;
+  stroke-linecap:round; stroke-linejoin:round;
+}
+@keyframes pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:.35; transform:scale(.65); }
+}
+
+.step-text h3 {
+  font-family:var(--sans); font-size:15px; font-weight:600;
+  margin-bottom:3px;
+}
+.step-text p {
+  font-size:13px; color:var(--muted); line-height:1.55;
+}
+
+
+/* ══════════════════════════════════════════════════════
+   S4  DASHBOARD
+══════════════════════════════════════════════════════ */
+.dash-header {
+  background:var(--navy);
+  display:flex; align-items:stretch;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.dash-brand {
+  display:flex; align-items:center;
+  padding:20px 32px 20px 48px;
+  border-right:1px solid rgba(255,255,255,.08);
+  flex-shrink:0;
+}
+.dash-meta {
+  padding:16px 32px; display:flex; flex-direction:column; justify-content:center;
+}
+.dash-eyebrow {
+  font-size:10px; font-weight:700; letter-spacing:.12em;
+  text-transform:uppercase; color:rgba(255,255,255,.38);
+  margin-bottom:3px;
+}
+.dash-title {
+  font-family:var(--serif); font-size:19px; font-weight:600; color:white;
+}
+.dash-stats {
+  display:flex; align-items:center; gap:32px;
+  padding:16px 48px 16px 32px;
+  margin-left:auto;
+}
+.dash-stat { text-align:right; }
+.dash-stat .n {
+  display:block; font-family:var(--serif);
+  font-size:22px; font-weight:700; color:var(--brass);
+  line-height:1;
+}
+.dash-stat .l {
+  font-size:10px; text-transform:uppercase; letter-spacing:.08em;
+  color:rgba(255,255,255,.35); font-weight:600;
+}
+
+/* Tab bar */
+.dash-tabs {
+  background:var(--navy);
+  display:flex; padding:0 48px; gap:0;
+  overflow-x:auto; border-bottom:1px solid rgba(255,255,255,.09);
+}
+.dash-tabs::-webkit-scrollbar { height:0; }
+
+.dash-tab {
+  flex:0 0 auto; background:transparent; border:none;
+  border-bottom:2px solid transparent;
+  padding:13px 18px;
+  font-size:13px; font-weight:500;
+  color:rgba(255,255,255,.42);
+  display:flex; align-items:center; gap:7px;
+  white-space:nowrap; cursor:pointer;
+  font-family:var(--sans);
+  transition:color var(--ease), border-color var(--ease);
+}
+.dash-tab:hover { color:rgba(255,255,255,.78); }
+.dash-tab.on { color:var(--brass); border-bottom-color:var(--brass); }
+.dash-tab svg {
+  width:13px; height:13px; stroke:currentColor; fill:none;
+  stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0;
+}
+
+/* Panel container */
+.dash-body {
+  max-width:940px; margin:0 auto; padding:40px 48px;
+}
+.dash-panel { display:none; }
+.dash-panel.on { display:block; }
+
+/* ─── card ──── */
+.card {
+  background:var(--card); border:1px solid var(--rule);
+  border-radius:var(--r-md); padding:20px 24px; margin-bottom:12px;
+}
+.card h3 { font-size:15px; font-weight:600; margin-bottom:10px; }
+
+/* ─── metrics ─ */
+.metrics {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:12px; margin-bottom:16px;
+}
+.metric {
+  background:white; border:1px solid var(--rule); border-radius:var(--r-md);
+  padding:18px 20px; position:relative; overflow:hidden;
+}
+.metric::before {
+  content:''; position:absolute; top:0; left:0;
+  width:3px; height:100%; background:var(--brass);
+}
+.metric-n {
+  font-family:var(--serif); font-size:30px; font-weight:700;
+  line-height:1; margin-bottom:4px;
+}
+.metric-l {
+  font-size:11px; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--muted); font-weight:600;
+}
+
+/* ─── sentiment bar ─ */
+.sent-bar {
+  display:flex; height:42px; border-radius:var(--r-sm);
+  gap:2px; overflow:hidden; margin-bottom:12px;
+}
+.sent-seg {
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:600;
+}
+.seg-sup { flex:0 0 62%; background:rgba(63,107,79,.14); color:var(--sage); border-radius:var(--r-sm) 0 0 var(--r-sm); }
+.seg-neu { flex:0 0 10%; background:rgba(138,130,112,.1); color:var(--muted); font-size:11px; }
+.seg-opp { flex:0 0 28%; background:rgba(156,63,58,.14); color:var(--clay); border-radius:0 var(--r-sm) var(--r-sm) 0; }
+.sent-legend {
+  display:flex; gap:20px; font-size:12px; color:var(--muted);
+  margin-bottom:24px; flex-wrap:wrap;
+}
+.sent-legend span { display:flex; align-items:center; gap:6px; }
+.sdot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+/* ─── quote card ─ */
+.quote {
+  background:white; border:1px solid var(--rule);
+  border-left:3px solid var(--brass);
+  border-radius:0 var(--r-md) var(--r-md) 0;
+  padding:18px 22px; margin-bottom:10px;
+}
+.quote-txt {
+  font-family:var(--serif); font-size:15px; font-style:italic;
+  line-height:1.72; color:var(--navy); margin-bottom:8px;
+}
+.quote-src {
+  font-size:11px; font-weight:700; letter-spacing:.07em;
+  text-transform:uppercase; color:var(--muted);
+}
+
+/* ─── concerns ─ */
+.concern {
+  background:var(--card); border:1px solid var(--rule); border-radius:var(--r-md);
+  padding:15px 18px; display:flex; align-items:center; gap:18px;
+  margin-bottom:10px; transition:border-color var(--ease);
+}
+.concern:hover { border-color:var(--brass); }
+.concern-n {
+  font-family:var(--serif); font-size:22px; font-weight:700;
+  color:var(--rule); width:28px; text-align:center; flex-shrink:0;
+}
+.concern-body { flex:1; }
+.concern-body h3 { font-family:var(--sans); font-size:15px; font-weight:600; margin-bottom:2px; }
+.concern-ct { font-size:12px; color:var(--muted); }
+.concern-bar { width:90px; height:4px; background:var(--rule); border-radius:2px; overflow:hidden; flex-shrink:0; }
+.concern-fill { height:100%; background:var(--brass); border-radius:2px; }
+
+/* ─── gap grid ─ */
+.gap-grid { display:grid; grid-template-columns:1fr 1fr; gap:2px; }
+.gap-head {
+  background:rgba(22,35,59,.06); border:1px solid var(--rule);
+  padding:12px 18px; font-family:var(--serif); font-size:14px; font-weight:600;
+}
+.gap-head:first-child { border-radius:var(--r-sm) 0 0 0; }
+.gap-head:nth-child(2) { border-radius:0 var(--r-sm) 0 0; }
+.gap-cell {
+  background:var(--card); border:1px solid var(--rule);
+  padding:14px 18px; font-size:14px; line-height:1.55;
+}
+.gap-cell.p-side { border-left:3px solid rgba(22,35,59,.2); }
+.gap-cell.r-side { border-left:3px solid var(--sage); color:var(--sage); }
+.sec-tag {
+  display:inline-block; font-size:10px; font-weight:700; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--muted);
+  background:rgba(138,130,112,.12); padding:2px 7px; border-radius:2px;
+  margin-bottom:5px;
+}
+
+/* ─── revisions ─ */
+.rev {
+  background:var(--card); border:1px solid var(--rule); border-radius:var(--r-md);
+  padding:20px 24px; margin-bottom:12px;
+}
+.rev-tag {
+  font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--muted); padding-bottom:10px; margin-bottom:12px;
+  border-bottom:1px solid var(--rule); display:block;
+}
+.rev-txt { font-size:15px; line-height:1.85; }
+.del { text-decoration:line-through; color:var(--clay); background:rgba(156,63,58,.07); padding:1px 3px; border-radius:2px; }
+.ins { color:var(--sage); font-weight:600; background:rgba(63,107,79,.08); padding:1px 3px; border-radius:2px; }
+
+/* ─── meeting prep ─ */
+.mq {
+  background:var(--card); border:1px solid var(--rule);
+  border-left:3px solid rgba(22,35,59,.18);
+  border-radius:0 var(--r-md) var(--r-md) 0;
+  padding:18px 22px; margin-bottom:12px;
+}
+.mq-q {
+  font-family:var(--serif); font-size:16px; font-weight:600;
+  margin-bottom:10px; line-height:1.4;
+}
+.mq-a { font-size:14px; color:var(--muted); line-height:1.65; }
+.mq-a strong { color:var(--navy); font-weight:600; }
+
+/* ─── memo ─ */
+.memo {
+  background:white; border:1px solid var(--rule); border-radius:var(--r-md); overflow:hidden;
+}
+.memo-hd {
+  background:var(--navy); padding:28px 36px;
+}
+.memo-hd-title {
+  font-size:11px; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--brass); margin-bottom:18px;
+}
+.memo-meta { display:grid; grid-template-columns:56px 1fr; gap:6px 16px; font-size:13px; }
+.mk { color:rgba(255,255,255,.4); font-weight:600; }
+.mv { color:rgba(255,255,255,.82); }
+.memo-bd { padding:28px 36px; }
+.memo-bd p {
+  font-family:var(--serif); font-size:15px; line-height:1.88;
+  color:var(--navy); margin-bottom:16px;
+}
+.memo-bd p:last-of-type { margin-bottom:0; }
+.memo-rule { border:none; border-top:1px solid var(--rule); margin:20px 0; }
+.memo-ft {
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
+  padding:16px 36px; background:rgba(22,35,59,.03); border-top:1px solid var(--rule);
+}
+.memo-attr { font-size:12px; color:var(--muted); }
+.btn-memo {
+  display:inline-flex; align-items:center; gap:8px;
+  background:var(--brass); color:white; border:none; border-radius:var(--r-sm);
+  padding:10px 20px; font-size:13px; font-weight:600; cursor:pointer;
+  font-family:var(--sans); transition:background var(--ease);
+}
+.btn-memo:hover { background:var(--brass-lt); }
+.btn-memo svg { width:14px; height:14px; stroke:white; fill:none; stroke-width:2; stroke-linecap:round; }
+
+/* ─── responsive ─────────────────────────────────────── */
+@media(max-width:700px){
+  .landing-wrap { padding:28px 24px 40px; }
+  .landing-h1  { font-size:38px; }
+  .landing-aside { display:none; }
+  .nav-bar { padding:16px 24px; }
+  .upload-body { padding:40px 24px 60px; }
+  .tray-grid   { grid-template-columns:1fr; }
+  .proc-body   { padding:48px 24px 60px; }
+  .dash-brand  { display:none; }
+  .dash-stats  { display:none; }
+  .dash-tabs   { padding:0 16px; }
+  .dash-body   { padding:28px 20px; }
+  .gap-grid    { grid-template-columns:1fr; }
+  .memo-hd     { padding:22px 22px; }
+  .memo-bd     { padding:22px 22px; }
+  .memo-ft     { padding:14px 22px; }
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═════════════════════════════════════════════════
+     S1 · LANDING
+═════════════════════════════════════════════════ -->
+<section id="s-landing" class="screen active">
+  <div class="landing-wrap">
+
+    <!-- Nav -->
+    <nav class="landing-nav">
+      <a class="pp-wordmark" href="#">
+        <div class="pp-mark">
+          <!-- Pulse/waveform mark -->
+          <svg viewBox="0 0 17 17" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 9h3l2-5 3 9 2-7 2 3h3"/>
+          </svg>
+        </div>
+        <span class="pp-name">Policy<em>Pulse</em></span>
+      </a>
+      <div class="landing-nav-links">
+        <a href="#">How it works</a>
+        <a href="#">Use cases</a>
+        <a href="#">Contact</a>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <div class="landing-hero">
+      <span class="eyebrow">Public comment analysis for civic leaders</span>
+      <h1 class="landing-h1">
+        Every public comment.<br>
+        <span class="brass">Weighed,</span> not just counted.
+      </h1>
+      <p class="landing-sub">
+        Upload a policy document and its public comments. PolicyPulse reads all of them, surfaces what residents actually care about, and hands you a council-ready report — in minutes.
+      </p>
+      <div class="landing-cta">
+        <button class="btn-primary" onclick="go('upload')">
+          Begin analysis
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 6.5h9M6.5 2l4.5 4.5-4.5 4.5"/>
+          </svg>
+        </button>
+        <button class="btn-ghost-landing" onclick="go('upload'); loadSample()">
+          Or view a sample report
+        </button>
+      </div>
+      <div class="landing-chips">
+        <span class="chip">City councils</span>
+        <span class="chip">School boards</span>
+        <span class="chip">Community coalitions</span>
+        <span class="chip">Planning commissions</span>
+      </div>
+    </div>
+
+  </div>
+
+  <span class="landing-aside">Public hearing · Council chamber · Civic record</span>
+</section>
+
+
+<!-- ═════════════════════════════════════════════════
+     S2 · UPLOAD
+═════════════════════════════════════════════════ -->
+<section id="s-upload" class="screen">
+  <header class="nav-bar">
+    <a class="pp-wordmark" href="#">
+      <div class="pp-mark">
+        <svg viewBox="0 0 17 17" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 9h3l2-5 3 9 2-7 2 3h3"/>
+        </svg>
+      </div>
+      <span class="pp-name">Policy<em>Pulse</em></span>
+    </a>
+    <button class="back-link" onclick="go('landing')">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 6.5H2M6.5 2L2 6.5l4.5 4.5"/>
+      </svg>
+      Back
+    </button>
+  </header>
+
+  <div class="upload-body">
+    <h2>Add your materials</h2>
+    <p class="lead">Upload the policy document and the public comments you want to analyze together.</p>
+
+    <div class="tray-grid">
+      <!-- Tray 1 -->
+      <div class="tray" id="tray-policy" onclick="fillTray('tray-policy','policy')">
+        <span class="tray-label">Policy document</span>
+        <div class="tray-icon">
+          <svg viewBox="0 0 24 24">
+            <rect x="4" y="2" width="12" height="18" rx="1.5"/>
+            <path d="M12 2v6h8M16 2l4 6"/>
+            <path d="M7 10h6M7 13h8M7 16h5"/>
+          </svg>
+        </div>
+        <h3>Policy document</h3>
+        <p class="tray-types">PDF · DOCX · TXT</p>
+        <div class="tray-placeholder">
+          <p>Drop your file here, or</p>
+          <button class="btn-browse" onclick="event.stopPropagation();fillTray('tray-policy','policy')">Browse files</button>
+        </div>
+        <div class="file-chip">
+          <svg viewBox="0 0 14 14"><polyline points="2 7 5.5 10.5 12 4"/></svg>
+          Amendment_12B_Parking_Zoning.pdf · 14 pages
+        </div>
+      </div>
+
+      <!-- Tray 2 -->
+      <div class="tray" id="tray-comments" onclick="fillTray('tray-comments','comments')">
+        <span class="tray-label">Public comments</span>
+        <div class="tray-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            <path d="M8 10h8M8 14h5"/>
+          </svg>
+        </div>
+        <h3>Public comments</h3>
+        <p class="tray-types">CSV · TXT</p>
+        <div class="tray-placeholder">
+          <p>Drop your file here, or</p>
+          <button class="btn-browse" onclick="event.stopPropagation();fillTray('tray-comments','comments')">Browse files</button>
+        </div>
+        <div class="file-chip">
+          <svg viewBox="0 0 14 14"><polyline points="2 7 5.5 10.5 12 4"/></svg>
+          public_comments_export.csv · 1,247 entries
+        </div>
+      </div>
+    </div>
+
+    <div class="upload-actions">
+      <button class="btn-text" style="color:var(--muted)" onclick="loadSample()">
+        Use sample files — Amendment 12-b, 1,247 comments
+      </button>
+      <button class="btn-primary" id="run-btn" disabled onclick="startRun()">
+        Run analysis
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 6.5h9M6.5 2l4.5 4.5-4.5 4.5"/>
+        </svg>
+      </button>
+    </div>
+
+    <p class="upload-trust">
+      <svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="5" width="8" height="6" rx="1"/><path d="M4 5V4a2 2 0 0 1 4 0v1"/></svg>
+      Processed for this session only. Nothing is stored or shared.
+    </p>
+  </div>
+</section>
+
+
+<!-- ═════════════════════════════════════════════════
+     S3 · PROCESSING
+═════════════════════════════════════════════════ -->
+<section id="s-processing" class="screen">
+  <header class="nav-bar">
+    <a class="pp-wordmark" href="#">
+      <div class="pp-mark">
+        <svg viewBox="0 0 17 17" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 9h3l2-5 3 9 2-7 2 3h3"/>
+        </svg>
+      </div>
+      <span class="pp-name">Policy<em>Pulse</em></span>
+    </a>
+  </header>
+
+  <div class="proc-body">
+    <h2>Reviewing your materials</h2>
+    <p class="proc-sub">Amendment 12-b · Residential parking · 1,247 comments</p>
+
+    <div class="proc-track"><div class="proc-fill" id="pBar"></div></div>
+    <span class="proc-count" id="pCount">Starting…</span>
+
+    <div class="proc-steps">
+
+      <div class="proc-step" data-i="0">
+        <div class="stamp">
+          <div class="stamp-pulse"></div>
+          <div class="stamp-check"><svg viewBox="0 0 17 17"><polyline points="3 8.5 6.5 12 14 5"/></svg></div>
+        </div>
+        <div class="step-text">
+          <h3>Reading the policy document</h3>
+          <p>Parsing sections, definitions, and proposed changes in Amendment 12-b</p>
+        </div>
+      </div>
+
+      <div class="proc-step" data-i="1">
+        <div class="stamp">
+          <div class="stamp-pulse"></div>
+          <div class="stamp-check"><svg viewBox="0 0 17 17"><polyline points="3 8.5 6.5 12 14 5"/></svg></div>
+        </div>
+        <div class="step-text">
+          <h3>Measuring public sentiment</h3>
+          <p>Classifying each of the 1,247 comments as supporting, opposing, or mixed</p>
+        </div>
+      </div>
+
+      <div class="proc-step" data-i="2">
+        <div class="stamp">
+          <div class="stamp-pulse"></div>
+          <div class="stamp-check"><svg viewBox="0 0 17 17"><polyline points="3 8.5 6.5 12 14 5"/></svg></div>
+        </div>
+        <div class="step-text">
+          <h3>Clustering resident concerns</h3>
+          <p>Grouping comments by theme to find the issues that matter most</p>
+        </div>
+      </div>
+
+      <div class="proc-step" data-i="3">
+        <div class="stamp">
+          <div class="stamp-pulse"></div>
+          <div class="stamp-check"><svg viewBox="0 0 17 17"><polyline points="3 8.5 6.5 12 14 5"/></svg></div>
+        </div>
+        <div class="step-text">
+          <h3>Comparing policy to public needs</h3>
+          <p>Mapping each concern to the specific section of the amendment it affects</p>
+        </div>
+      </div>
+
+      <div class="proc-step" data-i="4">
+        <div class="stamp">
+          <div class="stamp-pulse"></div>
+          <div class="stamp-check"><svg viewBox="0 0 17 17"><polyline points="3 8.5 6.5 12 14 5"/></svg></div>
+        </div>
+        <div class="step-text">
+          <h3>Drafting recommendations and memo</h3>
+          <p>Writing suggested revisions and preparing the executive memo for council</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═════════════════════════════════════════════════
+     S4 · DASHBOARD
+═════════════════════════════════════════════════ -->
+<section id="s-dashboard" class="screen">
+
+  <!-- Header -->
+  <div class="dash-header">
+    <div class="dash-brand">
+      <a class="pp-wordmark" href="#">
+        <div class="pp-mark">
+          <svg viewBox="0 0 17 17" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 9h3l2-5 3 9 2-7 2 3h3"/>
+          </svg>
+        </div>
+        <span class="pp-name">Policy<em>Pulse</em></span>
+      </a>
+    </div>
+    <div class="dash-meta">
+      <p class="dash-eyebrow">Amendment 12-b · Residential parking</p>
+      <p class="dash-title">Policy feedback report</p>
+    </div>
+    <div class="dash-stats">
+      <div class="dash-stat"><span class="n">1,247</span><span class="l">Comments</span></div>
+      <div class="dash-stat"><span class="n">14</span><span class="l">Pages</span></div>
+      <div class="dash-stat"><span class="n">3</span><span class="l">Hearings</span></div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <nav class="dash-tabs" id="dTabs">
+    <button class="dash-tab" data-t="summary">
+      <svg viewBox="0 0 14 14"><rect x="2" y="1" width="10" height="12" rx="1.5"/><path d="M4.5 5h5M4.5 7.5h5M4.5 10h3"/></svg>
+      Summary
+    </button>
+    <button class="dash-tab" data-t="sentiment">
+      <svg viewBox="0 0 14 14"><rect x="1" y="9" width="3" height="4"/><rect x="5.5" y="5.5" width="3" height="7.5"/><rect x="10" y="2" width="3" height="11"/></svg>
+      Sentiment
+    </button>
+    <button class="dash-tab" data-t="concerns">
+      <svg viewBox="0 0 14 14"><path d="M7 1.5v7M7 10.5v1.5"/><circle cx="7" cy="7" r="5.5" fill="none"/></svg>
+      Top concerns
+    </button>
+    <button class="dash-tab" data-t="gaps">
+      <svg viewBox="0 0 14 14"><path d="M1.5 7h4M8.5 7h4M5.5 4.5L3 7l2.5 2.5M8.5 4.5L11 7l-2.5 2.5"/></svg>
+      Gap analysis
+    </button>
+    <button class="dash-tab" data-t="revisions">
+      <svg viewBox="0 0 14 14"><path d="M9.5 2l2.5 2.5L5 12H2.5V9.5L9.5 2z"/><path d="M8 3.5l2.5 2.5"/></svg>
+      Revisions
+    </button>
+    <button class="dash-tab" data-t="meeting">
+      <svg viewBox="0 0 14 14"><path d="M13 11v-1.5A3.5 3.5 0 0 0 7 6v0"/><circle cx="9" cy="4" r="2"/><path d="M1 11V9.5A2.5 2.5 0 0 1 4 7"/><circle cx="4" cy="4" r="1.5"/></svg>
+      Meeting prep
+    </button>
+    <button class="dash-tab" data-t="memo">
+      <svg viewBox="0 0 14 14"><rect x="1.5" y="2.5" width="11" height="9" rx="1"/><path d="M1.5 6.5L7 9l5.5-2.5"/></svg>
+      Memo
+    </button>
+  </nav>
+
+  <!-- Panels -->
+  <div class="dash-body">
+
+    <!-- SUMMARY -->
+    <div class="dash-panel" data-p="summary">
+      <div class="metrics">
+        <div class="metric"><div class="metric-n">1,247</div><div class="metric-l">Comments reviewed</div></div>
+        <div class="metric"><div class="metric-n">14</div><div class="metric-l">Pages reviewed</div></div>
+        <div class="metric"><div class="metric-n">3</div><div class="metric-l">Hearings referenced</div></div>
+        <div class="metric"><div class="metric-n">8</div><div class="metric-l">Concern clusters</div></div>
+      </div>
+      <div class="card">
+        <h3>Plain-language summary</h3>
+        <p style="font-size:15px;line-height:1.75">Amendment 12-b rewrites the city's residential parking permit process. It raises permit fees by 18%, shortens the renewal window from 60 to 30 days, and removes the option to apply in person at neighborhood branch libraries, centralizing all applications at city hall. It also adds a low-income fee waiver, though the waiver's application process is not yet defined.</p>
+      </div>
+    </div>
+
+    <!-- SENTIMENT -->
+    <div class="dash-panel" data-p="sentiment">
+      <div class="sent-bar" role="img" aria-label="Sentiment breakdown: 62% support, 10% neutral, 28% oppose">
+        <div class="sent-seg seg-sup">62% support</div>
+        <div class="sent-seg seg-neu">10%</div>
+        <div class="sent-seg seg-opp">28% oppose</div>
+      </div>
+      <div class="sent-legend">
+        <span><span class="sdot" style="background:var(--sage)"></span>62% in support</span>
+        <span><span class="sdot" style="background:var(--muted)"></span>10% mixed or neutral</span>
+        <span><span class="sdot" style="background:var(--clay)"></span>28% opposed</span>
+      </div>
+      <div class="quote">
+        <p class="quote-txt">"The fee waiver is a good step, but the shorter renewal window will hurt people who already struggle to get to city hall."</p>
+        <p class="quote-src">Public comment · Web form</p>
+      </div>
+      <div class="quote">
+        <p class="quote-txt">"Removing in-person applications at the library branch cuts off the one option my parents actually use."</p>
+        <p class="quote-src">Public comment · March hearing</p>
+      </div>
+    </div>
+
+    <!-- CONCERNS -->
+    <div class="dash-panel" data-p="concerns">
+      <div class="concern">
+        <span class="concern-n">1</span>
+        <div class="concern-body"><h3>Loss of in-person and branch applications</h3><p class="concern-ct">342 mentions</p></div>
+        <div class="concern-bar"><div class="concern-fill" style="width:100%"></div></div>
+      </div>
+      <div class="concern">
+        <span class="concern-n">2</span>
+        <div class="concern-body"><h3>Permit fee increase of 18%</h3><p class="concern-ct">298 mentions</p></div>
+        <div class="concern-bar"><div class="concern-fill" style="width:87%"></div></div>
+      </div>
+      <div class="concern">
+        <span class="concern-n">3</span>
+        <div class="concern-body"><h3>Shortened 30-day renewal window</h3><p class="concern-ct">210 mentions</p></div>
+        <div class="concern-bar"><div class="concern-fill" style="width:62%"></div></div>
+      </div>
+      <div class="concern">
+        <span class="concern-n">4</span>
+        <div class="concern-body"><h3>Unclear fee-waiver process</h3><p class="concern-ct">164 mentions</p></div>
+        <div class="concern-bar"><div class="concern-fill" style="width:48%"></div></div>
+      </div>
+      <div class="concern">
+        <span class="concern-n">5</span>
+        <div class="concern-body"><h3>Accessibility for elderly residents</h3><p class="concern-ct">119 mentions</p></div>
+        <div class="concern-bar"><div class="concern-fill" style="width:35%"></div></div>
+      </div>
+    </div>
+
+    <!-- GAP ANALYSIS -->
+    <div class="dash-panel" data-p="gaps">
+      <div class="gap-grid">
+        <div class="gap-head">What the policy says</div>
+        <div class="gap-head">What residents are asking for</div>
+
+        <div class="gap-cell p-side"><span class="sec-tag">§4.1</span><br>Permit fee rises from $85 to $100 a year</div>
+        <div class="gap-cell r-side">Phase the increase over two years, or expand waiver eligibility</div>
+
+        <div class="gap-cell p-side"><span class="sec-tag">§4.2</span><br>Applications accepted only in person at city hall</div>
+        <div class="gap-cell r-side">Restore branch-office and online submission options</div>
+
+        <div class="gap-cell p-side"><span class="sec-tag">§4.3</span><br>Renewal window shortened to 30 days</div>
+        <div class="gap-cell r-side">Keep the 60-day window, or add a grace period</div>
+
+        <div class="gap-cell p-side"><span class="sec-tag">§6.0</span><br>Waiver process "to be determined by staff"</div>
+        <div class="gap-cell r-side">Publish the waiver process before the policy takes effect</div>
+      </div>
+    </div>
+
+    <!-- REVISIONS -->
+    <div class="dash-panel" data-p="revisions">
+      <div class="rev">
+        <span class="rev-tag">§4.2 — Application method</span>
+        <p class="rev-txt">Applications must be submitted <span class="del">in person at city hall during regular business hours</span> <span class="ins">online, by mail, or in person at city hall or any branch library</span>, within 30 days of the renewal notice.</p>
+      </div>
+      <div class="rev">
+        <span class="rev-tag">§4.3 — Renewal window</span>
+        <p class="rev-txt">Permit renewal applications are due <span class="del">30</span> <span class="ins">45</span> days before the current permit expires, <span class="ins">with a 15-day grace period for late renewals</span>.</p>
+      </div>
+      <div class="rev">
+        <span class="rev-tag">§6.0 — Fee waiver</span>
+        <p class="rev-txt">The low-income fee waiver application process <span class="del">will be determined by city staff</span> <span class="ins">is defined in Appendix C and published on the city website no later than 30 days before this amendment takes effect</span>.</p>
+      </div>
+    </div>
+
+    <!-- MEETING PREP -->
+    <div class="dash-panel" data-p="meeting">
+      <div class="mq">
+        <p class="mq-q">"Why was the in-person branch option removed?"</p>
+        <p class="mq-a"><strong>Suggested point:</strong> Acknowledge the accessibility gap and point to the restored branch and online options in revised §4.2.</p>
+      </div>
+      <div class="mq">
+        <p class="mq-q">"How will the low-income waiver actually work, and who qualifies?"</p>
+        <p class="mq-a"><strong>Suggested point:</strong> Point to Appendix C and the published timeline commitment — the process will be live before the amendment takes effect.</p>
+      </div>
+      <div class="mq">
+        <p class="mq-q">"Why raise fees at all if parking revenue already meets budget targets?"</p>
+        <p class="mq-a"><strong>Suggested point:</strong> Reference the maintenance funding rationale and the phased-increase compromise in revised §4.1, which caps year-one exposure at 9%.</p>
+      </div>
+    </div>
+
+    <!-- MEMO -->
+    <div class="dash-panel" data-p="memo">
+      <div class="memo">
+        <div class="memo-hd">
+          <p class="memo-hd-title">Executive memo</p>
+          <div class="memo-meta">
+            <span class="mk">To</span><span class="mv">City council, district planning committee</span>
+            <span class="mk">From</span><span class="mv">Office of policy analysis</span>
+            <span class="mk">Date</span><span class="mv">June 17, 2026</span>
+            <span class="mk">Re</span><span class="mv">Public feedback analysis — Amendment 12-b</span>
+          </div>
+        </div>
+        <div class="memo-bd">
+          <p>Of the 1,247 public comments reviewed, 62% expressed support for Amendment 12-b, largely citing the new low-income fee waiver as an important equity measure. Opposition and mixed reactions concentrated almost entirely on two provisions: the removal of in-person branch applications, cited by 342 respondents, and the shortened 30-day renewal window, raised by 210.</p>
+          <p>The gap analysis in this report maps each concern to the specific section it affects. In each case, a targeted revision addresses the concern without altering the amendment's core purpose or revenue assumptions.</p>
+          <hr class="memo-rule">
+          <p>We recommend the council adopt the three revisions documented in this report: restoring branch-office and online submission as valid application methods, extending the renewal window to 45 days with a 15-day grace period, and committing to publish the fee-waiver process no later than 30 days before the amendment takes effect.</p>
+        </div>
+        <div class="memo-ft">
+          <span class="memo-attr">Prepared by PolicyPulse · 1,247 comments · 3 hearing transcripts</span>
+          <button class="btn-memo">
+            <svg viewBox="0 0 14 14"><rect x="2" y="1.5" width="10" height="11" rx="1"/><path d="M4 5h6M4 7.5h6M4 10h3.5"/></svg>
+            Draft as Word document
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<script>
+/* ─── navigation ─── */
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ─── upload ─── */
+var filled = {};
+function fillTray(id, key) {
+  if(filled[key]) return;
+  filled[key] = true;
+  document.getElementById(id).classList.add('filled');
+  var btn = document.getElementById('run-btn');
+  if(filled.policy && filled.comments) btn.disabled = false;
+}
+function loadSample() {
+  fillTray('tray-policy','policy');
+  fillTray('tray-comments','comments');
+}
+function startRun() {
+  go('processing');
+  runProcess();
+}
+
+/* ─── processing ─── */
+var durations = [1300, 1500, 1700, 1400, 1600];
+function runProcess() {
+  var steps = document.querySelectorAll('.proc-step');
+  var bar = document.getElementById('pBar');
+  var count = document.getElementById('pCount');
+  var done = 0;
+
+  steps.forEach(s => s.classList.remove('active','done'));
+  steps[0].classList.add('active');
+  bar.style.width = '0%';
+  count.textContent = '0 of 5 complete';
+
+  function complete(i) {
+    steps[i].classList.remove('active');
+    steps[i].classList.add('done');
+    done++;
+    bar.style.width = (done/5*100)+'%';
+    count.textContent = done + ' of 5 complete';
+    if(i + 1 < steps.length) {
+      setTimeout(() => {
+        steps[i+1].classList.add('active');
+        setTimeout(() => complete(i+1), durations[i+1]);
+      }, 160);
+    } else {
+      setTimeout(() => { go('dashboard'); initDash(); }, 800);
+    }
+  }
+  setTimeout(() => complete(0), durations[0]);
+}
+
+/* ─── dashboard tabs ─── */
+function initDash() {
+  var tabs   = document.querySelectorAll('#dTabs .dash-tab');
+  var panels = document.querySelectorAll('.dash-panel');
+  function show(name) {
+    tabs.forEach(t   => t.classList.toggle('on', t.dataset.t === name));
+    panels.forEach(p => p.classList.toggle('on', p.dataset.p === name));
+  }
+  tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.t)));
+  show('summary');
+}
+
+/* init on direct nav to dashboard */
+document.addEventListener('DOMContentLoaded', initDash);
+</script>
+</body>
+</html>

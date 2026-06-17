@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PolicyPulse AI — Civic Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   POLICYPULSE AI — DESIGN TOKENS
+   Theme: Deep-navy civic intelligence / glass command-center
+   Display: Space Grotesk · Body: Inter · Data: JetBrains Mono
+   ============================================================ */
+:root{
+  --ink:#040810;
+  --bg-base:#060B16;
+  --bg-elevated:#0A1322;
+  --surface:rgba(16,25,44,0.58);
+  --surface-soft:rgba(16,25,44,0.34);
+  --surface-solid:#0D1729;
+  --border:rgba(141,170,255,0.13);
+  --border-strong:rgba(141,170,255,0.28);
+  --hairline:rgba(255,255,255,0.06);
+
+  --text-1:#EEF2FC;
+  --text-2:#9FACC9;
+  --text-3:#5C6885;
+
+  --blue:#4F7CFF;
+  --blue-soft:rgba(79,124,255,0.14);
+  --violet:#8C6CFF;
+  --violet-soft:rgba(140,108,255,0.14);
+  --teal:#2BE6C4;
+  --teal-soft:rgba(43,230,196,0.14);
+  --amber:#FFB454;
+  --amber-soft:rgba(255,180,84,0.14);
+  --coral:#FF6B6B;
+  --coral-soft:rgba(255,107,107,0.14);
+
+  --grad-primary:linear-gradient(135deg,#4F7CFF 0%,#8C6CFF 100%);
+  --grad-teal:linear-gradient(135deg,#2BE6C4 0%,#4F7CFF 100%);
+  --grad-warn:linear-gradient(135deg,#FFB454 0%,#FF6B6B 100%);
+
+  --r-sm:10px;
+  --r-md:16px;
+  --r-lg:22px;
+  --r-pill:999px;
+
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px;
+  --sp-6:32px; --sp-7:48px; --sp-8:64px;
+
+  --shadow-card:0 1px 0 rgba(255,255,255,0.04) inset, 0 20px 50px -20px rgba(0,0,0,0.65);
+  --shadow-pop:0 1px 0 rgba(255,255,255,0.06) inset, 0 30px 70px -25px rgba(0,0,0,0.75);
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+html,body{ height:100%; }
+body{
+  background:var(--bg-base);
+  color:var(--text-1);
+  font-family:'Inter',sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::selection{ background:var(--blue); color:#fff; }
+::-webkit-scrollbar{ width:8px; height:8px; }
+::-webkit-scrollbar-track{ background:transparent; }
+::-webkit-scrollbar-thumb{ background:rgba(141,170,255,0.18); border-radius:8px; }
+::-webkit-scrollbar-thumb:hover{ background:rgba(141,170,255,0.32); }
+
+a{ color:inherit; text-decoration:none; }
+button{ font-family:inherit; cursor:pointer; }
+
+h1,h2,h3,h4{ font-family:'Space Grotesk',sans-serif; letter-spacing:-0.01em; color:var(--text-1); }
+
+.mono{ font-family:'JetBrains Mono',monospace; }
+
+/* ---------- background canvas ---------- */
+#network-bg{
+  position:fixed; inset:0; z-index:0; width:100%; height:100%;
+  background:
+    radial-gradient(ellipse 1200px 700px at 12% -8%, rgba(79,124,255,0.16), transparent 60%),
+    radial-gradient(ellipse 900px 600px at 100% 8%, rgba(140,108,255,0.12), transparent 60%),
+    radial-gradient(ellipse 800px 800px at 50% 110%, rgba(43,230,196,0.07), transparent 60%),
+    var(--bg-base);
+}
+
+/* ---------- app shell ---------- */
+.app-shell{
+  position:relative; z-index:1;
+  display:grid;
+  grid-template-columns:272px 1fr;
+  min-height:100vh;
+}
+
+/* ===================== SIDEBAR ===================== */
+.sidebar{
+  border-right:1px solid var(--hairline);
+  background:linear-gradient(180deg, rgba(13,20,36,0.55), rgba(8,13,24,0.55));
+  backdrop-filter:blur(18px);
+  display:flex; flex-direction:column;
+  padding:var(--sp-5) var(--sp-4) var(--sp-5);
+  position:sticky; top:0; height:100vh; overflow-y:auto;
+}
+.brand{
+  display:flex; align-items:center; gap:10px;
+  padding:0 var(--sp-2) var(--sp-6);
+}
+.brand-mark{
+  width:34px; height:34px; border-radius:10px;
+  background:var(--grad-primary);
+  position:relative; flex-shrink:0;
+  box-shadow:0 0 0 1px rgba(255,255,255,0.12) inset, 0 6px 18px -6px rgba(79,124,255,0.7);
+}
+.brand-mark::before, .brand-mark::after{
+  content:''; position:absolute; border-radius:50%; background:#fff;
+}
+.brand-mark::before{ width:5px; height:5px; top:8px; left:8px; opacity:0.95; }
+.brand-mark::after{ width:5px; height:5px; bottom:8px; right:8px; opacity:0.6; }
+.brand-name{ font-family:'Space Grotesk',sans-serif; font-size:16.5px; font-weight:600; line-height:1.1; }
+.brand-sub{ font-size:10.5px; color:var(--text-3); text-transform:uppercase; letter-spacing:0.08em; margin-top:1px; }
+
+.nav-label{
+  font-size:10.5px; text-transform:uppercase; letter-spacing:0.1em;
+  color:var(--text-3); padding:0 var(--sp-2); margin:var(--sp-5) 0 var(--sp-3);
+  font-weight:600;
+}
+.nav-label:first-of-type{ margin-top:0; }
+
+.pipeline-nav{ list-style:none; position:relative; }
+.nav-step{
+  position:relative; display:flex; align-items:flex-start; gap:11px;
+  padding:9px 10px; border-radius:var(--r-sm); cursor:pointer;
+  transition:background 0.18s var(--ease);
+}
+.nav-step:hover{ background:rgba(141,170,255,0.06); }
+.nav-step.is-active{ background:var(--blue-soft); }
+.nav-step.is-active .step-label{ color:var(--text-1); }
+.nav-step:not(:last-child)::before{
+  content:''; position:absolute; left:20px; top:30px; bottom:-9px; width:1px;
+  background:linear-gradient(180deg, var(--border-strong), transparent);
+}
+.step-dot{
+  width:20px; height:20px; border-radius:50%; flex-shrink:0; margin-top:1px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600;
+  border:1px solid var(--border-strong); color:var(--text-3); background:var(--bg-elevated);
+  position:relative; z-index:1;
+}
+.nav-step[data-status="done"] .step-dot{ background:var(--teal-soft); border-color:var(--teal); color:var(--teal); }
+.nav-step[data-status="active"] .step-dot{ background:var(--blue); border-color:var(--blue); color:#fff; box-shadow:0 0 0 4px rgba(79,124,255,0.18); }
+.nav-step[data-status="active"] .step-dot::after{
+  content:''; position:absolute; inset:-5px; border-radius:50%; border:1px solid var(--blue);
+  animation:pulseRing 2.2s var(--ease) infinite;
+}
+.step-text{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.step-label{ font-size:13px; font-weight:560; color:var(--text-2); line-height:1.25; }
+.step-meta{ font-size:11px; color:var(--text-3); font-family:'JetBrains Mono',monospace; }
+
+@keyframes pulseRing{ 0%{ transform:scale(0.9); opacity:0.9;} 100%{ transform:scale(1.6); opacity:0;} }
+
+.tool-link{
+  display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:var(--r-sm);
+  font-size:13px; color:var(--text-2); transition:background 0.18s var(--ease);
+}
+.tool-link:hover{ background:rgba(141,170,255,0.06); color:var(--text-1); }
+.tool-icon{ width:18px; height:18px; display:flex; align-items:center; justify-content:center; color:var(--text-3); flex-shrink:0; }
+
+.sidebar-footer{
+  margin-top:auto; padding-top:var(--sp-5); border-top:1px solid var(--hairline);
+  display:flex; align-items:center; gap:10px;
+}
+.avatar{
+  width:32px; height:32px; border-radius:9px; background:var(--grad-teal);
+  display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#04201b;
+  flex-shrink:0;
+}
+.footer-text{ font-size:12.5px; line-height:1.3; }
+.footer-text b{ color:var(--text-1); font-weight:600; display:block; }
+.footer-text span{ color:var(--text-3); font-size:11px; }
+
+/* ===================== TOPBAR ===================== */
+.main{ min-width:0; display:flex; flex-direction:column; }
+.topbar{
+  position:sticky; top:0; z-index:5;
+  display:flex; align-items:center; justify-content:space-between; gap:var(--sp-4);
+  padding:18px var(--sp-6);
+  border-bottom:1px solid var(--hairline);
+  background:rgba(6,11,22,0.72); backdrop-filter:blur(16px);
+}
+.breadcrumb{ display:flex; flex-direction:column; gap:2px; }
+.breadcrumb-eyebrow{ font-size:11px; color:var(--text-3); font-family:'JetBrains Mono',monospace; letter-spacing:0.04em; }
+.breadcrumb-title{ font-size:19px; font-weight:600; }
+.live-badge{
+  display:inline-flex; align-items:center; gap:6px; margin-left:10px;
+  font-size:10.5px; font-family:'JetBrains Mono',monospace; color:var(--teal);
+  background:var(--teal-soft); border:1px solid rgba(43,230,196,0.3);
+  padding:3px 9px 3px 7px; border-radius:var(--r-pill); vertical-align:middle;
+}
+.live-dot{ width:6px; height:6px; border-radius:50%; background:var(--teal); animation:blink 1.6s ease-in-out infinite; }
+@keyframes blink{ 0%,100%{ opacity:1;} 50%{ opacity:0.25;} }
+
+.score-chips{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.chip{
+  display:flex; align-items:center; gap:8px; padding:7px 12px 7px 10px;
+  border-radius:var(--r-pill); background:var(--surface-soft); border:1px solid var(--border);
+}
+.chip-ring{ width:24px; height:24px; border-radius:50%; flex-shrink:0; }
+.chip-text{ display:flex; flex-direction:column; line-height:1.1; }
+.chip-val{ font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; }
+.chip-label{ font-size:9.5px; color:var(--text-3); text-transform:uppercase; letter-spacing:0.05em; }
+
+.topbar-actions{ display:flex; gap:8px; }
+.btn{
+  display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:560;
+  padding:9px 15px; border-radius:var(--r-sm); border:1px solid var(--border-strong);
+  background:var(--surface-soft); color:var(--text-1); transition:transform 0.15s var(--ease), background 0.15s var(--ease), border-color .15s;
+}
+.btn:hover{ background:rgba(141,170,255,0.1); transform:translateY(-1px); }
+.btn:active{ transform:translateY(0) scale(0.98); }
+.btn-primary{ background:var(--grad-primary); border:none; box-shadow:0 8px 22px -10px rgba(79,124,255,0.6); }
+.btn-primary:hover{ filter:brightness(1.08); }
+.btn-ghost{ background:transparent; border-color:var(--hairline); color:var(--text-2); }
+
+/* ===================== CONTENT ===================== */
+.content{ padding:var(--sp-6); display:flex; flex-direction:column; gap:var(--sp-6); }
+.view-section{ display:none; flex-direction:column; gap:var(--sp-6); animation:viewIn 0.45s var(--ease); }
+.view-section.is-active{ display:flex; }
+@keyframes viewIn{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:translateY(0);} }
+
+.section-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:var(--sp-4); flex-wrap:wrap; }
+.section-head h2{ font-size:22px; font-weight:600; }
+.section-sub{ color:var(--text-2); font-size:13.5px; margin-top:4px; max-width:640px; line-height:1.5; }
+
+/* ---------- glass card ---------- */
+.card{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg);
+  backdrop-filter:blur(20px); box-shadow:var(--shadow-card); padding:var(--sp-5);
+  transition:transform 0.2s var(--ease), border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.card:hover{ border-color:var(--border-strong); }
+.card-flat{ background:var(--surface-soft); border:1px solid var(--hairline); border-radius:var(--r-md); padding:var(--sp-4); }
+
+.grid{ display:grid; gap:var(--sp-5); }
+.grid-4{ grid-template-columns:repeat(4,1fr); }
+.grid-3{ grid-template-columns:repeat(3,1fr); }
+.grid-2{ grid-template-columns:repeat(2,1fr); }
+.grid-12{ grid-template-columns:repeat(12,1fr); }
+
+.eyebrow{ font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-3); }
+
+/* ---------- badges ---------- */
+.badge{ display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; padding:4px 9px; border-radius:var(--r-pill); }
+.badge-teal{ background:var(--teal-soft); color:var(--teal); border:1px solid rgba(43,230,196,0.3); }
+.badge-blue{ background:var(--blue-soft); color:#9DB6FF; border:1px solid rgba(79,124,255,0.3); }
+.badge-violet{ background:var(--violet-soft); color:#C3B3FF; border:1px solid rgba(140,108,255,0.3); }
+.badge-amber{ background:var(--amber-soft); color:var(--amber); border:1px solid rgba(255,180,84,0.3); }
+.badge-coral{ background:var(--coral-soft); color:var(--coral); border:1px solid rgba(255,107,107,0.3); }
+.badge-neutral{ background:rgba(255,255,255,0.05); color:var(--text-2); border:1px solid var(--hairline); }
+
+/* ---------- score card (mission control) ---------- */
+.score-card{ display:flex; flex-direction:column; gap:var(--sp-3); position:relative; overflow:hidden; }
+.score-top{ display:flex; align-items:center; justify-content:space-between; }
+.score-name{ font-size:12.5px; color:var(--text-2); font-weight:560; }
+.score-big{ display:flex; align-items:baseline; gap:6px; }
+.score-num{ font-family:'Space Grotesk',sans-serif; font-size:40px; font-weight:700; line-height:1; }
+.score-of{ font-size:14px; color:var(--text-3); }
+.score-delta{ font-size:11.5px; font-family:'JetBrains Mono',monospace; display:flex; align-items:center; gap:4px; }
+.delta-up{ color:var(--teal); } .delta-down{ color:var(--coral); }
+.score-bar{ height:6px; border-radius:4px; background:rgba(255,255,255,0.06); overflow:hidden; }
+.score-bar i{ display:block; height:100%; border-radius:4px; transition:width 1.2s var(--ease); }
+.score-glow{ position:absolute; width:160px; height:160px; border-radius:50%; filter:blur(50px); opacity:0.18; top:-60px; right:-60px; pointer-events:none; }
+
+/* ---------- risk matrix ---------- */
+.risk-matrix-wrap{ display:flex; gap:var(--sp-5); align-items:flex-start; }
+.risk-grid{ display:grid; grid-template-columns:repeat(5,1fr); grid-template-rows:repeat(5,1fr); gap:5px; width:280px; height:280px; flex-shrink:0; }
+.risk-cell{ border-radius:7px; position:relative; display:flex; align-items:center; justify-content:center; }
+.risk-axis-y{ display:flex; flex-direction:column-reverse; justify-content:space-between; height:280px; padding-right:6px; }
+.risk-axis-y span, .risk-axis-x span{ font-size:9.5px; color:var(--text-3); font-family:'JetBrains Mono',monospace; }
+.risk-axis-x{ display:flex; justify-content:space-between; width:280px; margin-left:24px; margin-top:6px; }
+.risk-dot{ width:11px; height:11px; border-radius:50%; border:1.5px solid rgba(255,255,255,0.7); box-shadow:0 0 0 3px rgba(0,0,0,0.25); cursor:pointer; }
+.risk-axes-block{ display:flex; }
+.risk-legend{ display:flex; flex-direction:column; gap:10px; }
+.risk-legend-row{ display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--text-2); }
+.risk-legend-sw{ width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+
+/* ---------- evidence card ---------- */
+.evidence-card{ display:flex; flex-direction:column; gap:10px; }
+.evidence-quote{ font-size:14px; line-height:1.55; color:var(--text-1); font-style:italic; }
+.evidence-quote::before{ content:'"'; color:var(--blue); font-family:'Space Grotesk',sans-serif; }
+.evidence-quote::after{ content:'"'; color:var(--blue); font-family:'Space Grotesk',sans-serif; }
+.evidence-meta{ display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+.evidence-source{ font-size:11.5px; color:var(--text-3); }
+
+/* ---------- agent card ---------- */
+.agent-card{ display:flex; flex-direction:column; gap:12px; }
+.agent-top{ display:flex; align-items:center; gap:11px; }
+.agent-icon{ width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.agent-name{ font-size:14px; font-weight:600; }
+.agent-role{ font-size:11.5px; color:var(--text-3); }
+.agent-status-row{ display:flex; align-items:center; justify-content:space-between; }
+.agent-log{ font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-2); background:rgba(0,0,0,0.22); border:1px solid var(--hairline); border-radius:9px; padding:9px 10px; min-height:34px; line-height:1.5; }
+.confidence-row{ display:flex; align-items:center; gap:8px; }
+.confidence-track{ flex:1; height:5px; border-radius:4px; background:rgba(255,255,255,0.06); overflow:hidden; }
+.confidence-fill{ height:100%; border-radius:4px; }
+
+/* ---------- live feed terminal ---------- */
+.feed-terminal{ background:rgba(3,6,12,0.55); border:1px solid var(--hairline); border-radius:var(--r-md); padding:var(--sp-3) var(--sp-4); max-height:320px; overflow-y:auto; display:flex; flex-direction:column-reverse; gap:0; }
+.feed-row{ display:flex; gap:10px; padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:12px; align-items:baseline; flex-wrap:wrap; }
+.feed-time{ font-family:'JetBrains Mono',monospace; color:var(--text-3); font-size:11px; flex-shrink:0; }
+.feed-agent{ font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; flex-shrink:0; min-width:150px; }
+.feed-line{ color:var(--text-2); flex:1; min-width:200px; }
+
+/* ---------- gap table ---------- */
+.gap-table{ width:100%; border-collapse:collapse; font-size:13px; }
+.gap-table th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-3); padding:10px 14px; border-bottom:1px solid var(--border); font-weight:600; }
+.gap-table td{ padding:13px 14px; border-bottom:1px solid var(--hairline); color:var(--text-2); vertical-align:middle; }
+.gap-table tr:hover td{ background:rgba(141,170,255,0.04); }
+.gap-section-name{ color:var(--text-1); font-weight:560; }
+.mini-bar{ width:90px; height:6px; border-radius:4px; background:rgba(255,255,255,0.06); overflow:hidden; display:inline-block; vertical-align:middle; margin-right:8px; }
+.mini-bar i{ display:block; height:100%; border-radius:4px; }
+
+/* ---------- revision engine ---------- */
+.revision-layout{ display:grid; grid-template-columns:240px 1fr; gap:var(--sp-5); }
+.clause-list{ display:flex; flex-direction:column; gap:6px; }
+.clause-item{ padding:11px 12px; border-radius:var(--r-sm); cursor:pointer; border:1px solid transparent; transition:background .15s; }
+.clause-item:hover{ background:rgba(141,170,255,0.06); }
+.clause-item.is-active{ background:var(--blue-soft); border-color:rgba(79,124,255,0.3); }
+.clause-item-title{ font-size:12.5px; font-weight:600; color:var(--text-1); }
+.clause-item-tag{ font-size:10.5px; color:var(--text-3); margin-top:2px; }
+.diff-cols{ display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-4); }
+.diff-pane{ display:flex; flex-direction:column; gap:8px; }
+.diff-pane-label{ font-size:10.5px; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-3); font-weight:600; }
+.diff-text{ font-size:13.5px; line-height:1.7; color:var(--text-2); }
+.diff-text del{ background:rgba(255,107,107,0.16); color:#FFB3B3; text-decoration:line-through; padding:0 2px; border-radius:3px; }
+.diff-text ins{ background:rgba(43,230,196,0.16); color:#9FF3E2; text-decoration:none; padding:0 2px; border-radius:3px; }
+.revision-actions{ display:flex; gap:8px; margin-top:6px; }
+.btn-accept{ background:var(--teal-soft); color:var(--teal); border-color:rgba(43,230,196,0.35); }
+.btn-reject{ background:var(--coral-soft); color:var(--coral); border-color:rgba(255,107,107,0.35); }
+
+/* ---------- executive brief ---------- */
+.brief-doc{ background:linear-gradient(180deg, rgba(20,30,52,0.55), rgba(13,20,36,0.55)); border:1px solid var(--border); border-radius:var(--r-lg); padding:var(--sp-7); position:relative; overflow:hidden; }
+.brief-letterhead{ display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--border); padding-bottom:var(--sp-5); margin-bottom:var(--sp-5); }
+.brief-title{ font-size:25px; font-weight:700; max-width:480px; line-height:1.25; }
+.brief-class{ text-align:right; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-3); line-height:1.6; }
+.brief-summary{ font-size:14.5px; line-height:1.8; color:var(--text-2); max-width:760px; }
+.rec-item{ display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:flex-start; padding:14px 0; border-bottom:1px solid var(--hairline); }
+.rec-rank{ width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; background:rgba(255,255,255,0.05); color:var(--text-2); flex-shrink:0; }
+.rec-title{ font-size:13.5px; font-weight:600; color:var(--text-1); }
+.rec-evidence{ font-size:12px; color:var(--text-3); margin-top:4px; font-style:italic; }
+.rec-conf{ text-align:right; flex-shrink:0; }
+.rec-conf b{ display:block; font-family:'JetBrains Mono',monospace; font-size:15px; color:var(--teal); }
+.rec-conf span{ font-size:9.5px; color:var(--text-3); text-transform:uppercase; }
+
+/* ---------- survey generator modal ---------- */
+.modal-overlay{ position:fixed; inset:0; background:rgba(4,8,16,0.65); backdrop-filter:blur(4px); z-index:50; display:none; align-items:flex-start; justify-content:center; padding:6vh var(--sp-5); }
+.modal-overlay.is-open{ display:flex; animation:fadeIn .2s var(--ease); }
+@keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
+.modal-panel{ width:min(680px,100%); background:var(--surface-solid); border:1px solid var(--border-strong); border-radius:var(--r-lg); box-shadow:var(--shadow-pop); padding:var(--sp-6); max-height:84vh; overflow-y:auto; animation:panelIn .28s var(--ease); }
+@keyframes panelIn{ from{opacity:0; transform:translateY(10px) scale(0.98);} to{opacity:1; transform:translateY(0) scale(1);} }
+.modal-head{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:var(--sp-5); }
+.modal-close{ width:30px; height:30px; border-radius:8px; background:var(--surface-soft); border:1px solid var(--hairline); display:flex; align-items:center; justify-content:center; color:var(--text-2); flex-shrink:0; }
+.modal-close:hover{ background:rgba(255,255,255,0.08); }
+.survey-q{ display:flex; gap:12px; padding:13px 0; border-bottom:1px solid var(--hairline); }
+.survey-q-idx{ font-family:'JetBrains Mono',monospace; color:var(--text-3); font-size:12px; flex-shrink:0; width:22px; }
+.survey-q-text{ font-size:13.5px; color:var(--text-1); line-height:1.5; }
+.survey-q-type{ font-size:10.5px; color:var(--text-3); margin-top:4px; }
+.shimmer-line{ height:14px; border-radius:4px; background:linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.12), rgba(255,255,255,0.04)); background-size:200% 100%; animation:shimmer 1.3s infinite; margin-bottom:10px; }
+@keyframes shimmer{ 0%{ background-position:200% 0;} 100%{ background-position:-200% 0;} }
+
+/* ---------- theme bars ---------- */
+.theme-row{ display:flex; align-items:center; gap:12px; padding:9px 0; }
+.theme-label{ width:170px; font-size:12.5px; color:var(--text-2); flex-shrink:0; }
+.theme-track{ flex:1; height:9px; border-radius:5px; background:rgba(255,255,255,0.05); overflow:hidden; display:flex; }
+.theme-count{ width:40px; text-align:right; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-3); flex-shrink:0; }
+
+/* ---------- agent network diagram ---------- */
+.orchestration-wrap{ display:flex; align-items:center; justify-content:center; padding:var(--sp-4) 0; }
+
+/* ---------- utility ---------- */
+.flex-between{ display:flex; align-items:center; justify-content:space-between; }
+.muted{ color:var(--text-3); }
+.mt-1{ margin-top:var(--sp-2);} .mt-2{ margin-top:var(--sp-3);} .mt-3{ margin-top:var(--sp-4);}
+
+/* ---------- responsive ---------- */
+@media (max-width:1180px){
+  .grid-4{ grid-template-columns:repeat(2,1fr); }
+  .grid-3{ grid-template-columns:repeat(2,1fr); }
+  .diff-cols{ grid-template-columns:1fr; }
+  .risk-matrix-wrap{ flex-direction:column; }
+}
+@media (max-width:920px){
+  .app-shell{ grid-template-columns:1fr; }
+  .sidebar{ position:relative; height:auto; }
+  .revision-layout{ grid-template-columns:1fr; }
+  .topbar{ flex-wrap:wrap; gap:12px; }
+}
+@media (max-width:640px){
+  .grid-4, .grid-3, .grid-2{ grid-template-columns:1fr; }
+  .content{ padding:var(--sp-4); }
+  .topbar{ padding:14px var(--sp-4); }
+  .brief-doc{ padding:var(--sp-5); }
+}
+</style>
+</head>
+<body>
+<canvas id="network-bg"></canvas>
+
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div>
+        <div class="brand-name">PolicyPulse AI</div>
+        <div class="brand-sub">Civic Intelligence</div>
+      </div>
+    </div>
+
+    <div class="nav-label">Consultation Pipeline</div>
+    <ul class="pipeline-nav" id="pipeline-nav">
+      <li class="nav-step is-active" data-status="active" data-target="mission-control" data-label="Mission Control">
+        <span class="step-dot">01</span>
+        <span class="step-text"><span class="step-label">Mission Control</span><span class="step-meta">overview</span></span>
+      </li>
+      <li class="nav-step" data-status="active" data-target="agent-intelligence" data-label="AI Agent Intelligence">
+        <span class="step-dot">02</span>
+        <span class="step-text"><span class="step-label">AI Agent Intelligence</span><span class="step-meta">6 agents running</span></span>
+      </li>
+      <li class="nav-step" data-status="done" data-target="public-voice" data-label="Public Voice Analysis">
+        <span class="step-dot">03</span>
+        <span class="step-text"><span class="step-label">Public Voice Analysis</span><span class="step-meta">1,284 comments</span></span>
+      </li>
+      <li class="nav-step" data-status="done" data-target="gap-intelligence" data-label="Gap Intelligence">
+        <span class="step-dot">04</span>
+        <span class="step-text"><span class="step-label">Gap Intelligence</span><span class="step-meta">8 gaps found</span></span>
+      </li>
+      <li class="nav-step" data-status="active" data-target="revision-engine" data-label="Policy Revision Engine">
+        <span class="step-dot">05</span>
+        <span class="step-text"><span class="step-label">Policy Revision Engine</span><span class="step-meta">12 clauses drafted</span></span>
+      </li>
+      <li class="nav-step" data-status="pending" data-target="executive-brief" data-label="Executive Decision Brief">
+        <span class="step-dot">06</span>
+        <span class="step-text"><span class="step-label">Executive Decision Brief</span><span class="step-meta">awaiting sign-off</span></span>
+      </li>
+    </ul>
+
+    <div class="nav-label">Tools</div>
+    <a class="tool-link" id="open-survey-generator">
+      <span class="tool-icon">&#9783;</span> Survey Generator
+    </a>
+    <a class="tool-link" data-target="public-voice" data-label="Public Voice Analysis">
+      <span class="tool-icon">&#128269;</span> Evidence Search
+    </a>
+
+    <div class="sidebar-footer">
+      <div class="avatar">RC</div>
+      <div class="footer-text">
+        <b>Reviewer Console</b>
+        <span>Metro City Council Workspace</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div class="breadcrumb">
+        <div class="breadcrumb-eyebrow">POLICYPULSE / DRAFT URBAN MOBILITY &amp; TRANSIT POLICY 2026</div>
+        <div class="breadcrumb-title">
+          <span id="breadcrumb-current">Mission Control</span>
+          <span class="live-badge"><span class="live-dot"></span>6 agents active</span>
+        </div>
+      </div>
+      <div class="score-chips" id="topbar-chips">
+        <div class="chip" title="Policy Health Score">
+          <svg class="chip-ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#2BE6C4" stroke-width="3" stroke-dasharray="97.4" stroke-dashoffset="22" stroke-linecap="round" transform="rotate(-90 18 18)"/></svg>
+          <div class="chip-text"><span class="chip-val">78</span><span class="chip-label">Policy Health</span></div>
+        </div>
+        <div class="chip" title="Public Trust Score">
+          <svg class="chip-ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#4F7CFF" stroke-width="3" stroke-dasharray="97.4" stroke-dashoffset="42" stroke-linecap="round" transform="rotate(-90 18 18)"/></svg>
+          <div class="chip-text"><span class="chip-val">61</span><span class="chip-label">Public Trust</span></div>
+        </div>
+        <div class="chip" title="Alignment Score">
+          <svg class="chip-ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#FFB454" stroke-width="3" stroke-dasharray="97.4" stroke-dashoffset="49" stroke-linecap="round" transform="rotate(-90 18 18)"/></svg>
+          <div class="chip-text"><span class="chip-val">66</span><span class="chip-label">Alignment</span></div>
+        </div>
+        <div class="chip" title="Recommendation Confidence Score">
+          <svg class="chip-ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="3"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#8C6CFF" stroke-width="3" stroke-dasharray="97.4" stroke-dashoffset="13" stroke-linecap="round" transform="rotate(-90 18 18)"/></svg>
+          <div class="chip-text"><span class="chip-val">87</span><span class="chip-label">Rec. Confidence</span></div>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost">Sync data</button>
+        <button class="btn btn-primary">Export brief</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <!--SECTIONS-->
+
+      <!-- ============ 01 · MISSION CONTROL ============ -->
+      <section class="view-section is-active" id="mission-control">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Active Review · Started Jun 2, 2026</span>
+            <h2>Draft Urban Mobility &amp; Transit Policy 2026</h2>
+            <p class="section-sub">Multi-agent consultation analysis across 1,284 public submissions from 6 stakeholder groups. Last data sync 4 minutes ago — agents are continuously re-scoring as new comments arrive.</p>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-ghost" data-target="public-voice" onclick="goTo('public-voice')">View evidence</button>
+            <button class="btn btn-primary" onclick="goTo('executive-brief')">Open executive brief</button>
+          </div>
+        </div>
+
+        <div class="grid grid-4">
+          <div class="card score-card">
+            <div class="score-glow" style="background:#2BE6C4;"></div>
+            <div class="score-top"><span class="score-name">Policy Health Score</span><span class="badge badge-teal">Stable</span></div>
+            <div class="score-big"><span class="score-num" data-countup="78">0</span><span class="score-of">/100</span></div>
+            <div class="score-delta delta-up">&#8593; 4 pts vs last draft</div>
+            <div class="score-bar"><i style="width:78%;background:var(--grad-teal);"></i></div>
+          </div>
+          <div class="card score-card">
+            <div class="score-glow" style="background:#4F7CFF;"></div>
+            <div class="score-top"><span class="score-name">Public Trust Score</span><span class="badge badge-amber">Watch</span></div>
+            <div class="score-big"><span class="score-num" data-countup="61">0</span><span class="score-of">/100</span></div>
+            <div class="score-delta delta-down">&#8595; 6 pts vs last draft</div>
+            <div class="score-bar"><i style="width:61%;background:var(--grad-primary);"></i></div>
+          </div>
+          <div class="card score-card">
+            <div class="score-glow" style="background:#FFB454;"></div>
+            <div class="score-top"><span class="score-name">Alignment Score</span><span class="badge badge-amber">Partial</span></div>
+            <div class="score-big"><span class="score-num" data-countup="66">0</span><span class="score-of">/100</span></div>
+            <div class="score-delta delta-up">&#8593; 2 pts vs last draft</div>
+            <div class="score-bar"><i style="width:66%;background:var(--grad-warn);"></i></div>
+          </div>
+          <div class="card score-card">
+            <div class="score-glow" style="background:#8C6CFF;"></div>
+            <div class="score-top"><span class="score-name">Recommendation Confidence</span><span class="badge badge-teal">High</span></div>
+            <div class="score-big"><span class="score-num" data-countup="87">0</span><span class="score-of">/100</span></div>
+            <div class="score-delta delta-up">&#8593; 9 pts vs last draft</div>
+            <div class="score-bar"><i style="width:87%;background:linear-gradient(135deg,#8C6CFF,#4F7CFF);"></i></div>
+          </div>
+        </div>
+
+        <div class="grid grid-12" style="grid-template-columns:1.1fr 1fr;">
+          <div class="card">
+            <div class="flex-between">
+              <div>
+                <h3 style="font-size:15px;">Risk Matrix</h3>
+                <span class="muted" style="font-size:12px;">Likelihood × Impact across active concerns</span>
+              </div>
+              <a class="badge badge-neutral" style="cursor:pointer;" onclick="goTo('executive-brief')">Full matrix &#8594;</a>
+            </div>
+            <div class="risk-matrix-wrap mt-3" id="risk-matrix-mc"></div>
+          </div>
+
+          <div class="card">
+            <div class="flex-between">
+              <h3 style="font-size:15px;">Pipeline Progress</h3>
+              <span class="badge badge-blue mono">stage 5 / 6</span>
+            </div>
+            <div class="mt-3" style="display:flex;flex-direction:column;gap:14px;">
+              <div class="flex-between"><span style="font-size:12.5px;color:var(--text-2);">Public Voice Analysis</span><span class="mono" style="font-size:11.5px;color:var(--teal);">complete</span></div>
+              <div class="score-bar"><i style="width:100%;background:var(--teal);"></i></div>
+              <div class="flex-between"><span style="font-size:12.5px;color:var(--text-2);">Gap Intelligence</span><span class="mono" style="font-size:11.5px;color:var(--teal);">complete</span></div>
+              <div class="score-bar"><i style="width:100%;background:var(--teal);"></i></div>
+              <div class="flex-between"><span style="font-size:12.5px;color:var(--text-2);">Policy Revision Engine</span><span class="mono" style="font-size:11.5px;color:var(--blue);">72%</span></div>
+              <div class="score-bar"><i style="width:72%;background:var(--blue);"></i></div>
+              <div class="flex-between"><span style="font-size:12.5px;color:var(--text-2);">Executive Decision Brief</span><span class="mono" style="font-size:11.5px;color:var(--text-3);">queued</span></div>
+              <div class="score-bar"><i style="width:14%;background:var(--text-3);"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="flex-between">
+            <h3 style="font-size:15px;">Agent Activity</h3>
+            <a class="badge badge-neutral" style="cursor:pointer;" onclick="goTo('agent-intelligence')">Open command center &#8594;</a>
+          </div>
+          <div class="feed-terminal mt-3 live-feed" id="mc-feed" style="max-height:190px;"></div>
+        </div>
+      </section>
+
+      <!-- ============ PUBLIC VOICE ANALYSIS ============ -->
+      <section class="view-section" id="public-voice">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Evidence Explorer</span>
+            <h2>Public Voice Analysis</h2>
+            <p class="section-sub">Every theme and score traces back to verbatim public submissions. Filter, search, and inspect the raw evidence behind each AI finding.</p>
+          </div>
+        </div>
+
+        <div class="card" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+          <input type="text" placeholder="Search 1,284 submissions..." style="flex:1;min-width:220px;background:rgba(0,0,0,0.22);border:1px solid var(--hairline);border-radius:var(--r-sm);padding:10px 14px;color:var(--text-1);font-size:13px;">
+          <span class="badge badge-teal" style="cursor:pointer;">Supportive · 61%</span>
+          <span class="badge badge-amber" style="cursor:pointer;">Concerned · 22%</span>
+          <span class="badge badge-coral" style="cursor:pointer;">Critical · 17%</span>
+          <span class="badge badge-neutral" style="cursor:pointer;">All stakeholders</span>
+        </div>
+
+        <div class="grid" style="grid-template-columns:1fr 1.4fr;">
+          <div class="card">
+            <h3 style="font-size:15px;">Theme Clusters</h3>
+            <div class="mt-3">
+              <div class="theme-row"><span class="theme-label">Fare affordability</span><div class="theme-track"><div style="width:48%;background:var(--coral);"></div><div style="width:30%;background:var(--amber);"></div><div style="width:22%;background:var(--teal);"></div></div><span class="theme-count">214</span></div>
+              <div class="theme-row"><span class="theme-label">Last-mile connectivity</span><div class="theme-track"><div style="width:20%;background:var(--coral);"></div><div style="width:35%;background:var(--amber);"></div><div style="width:45%;background:var(--teal);"></div></div><span class="theme-count">186</span></div>
+              <div class="theme-row"><span class="theme-label">Route accessibility</span><div class="theme-track"><div style="width:15%;background:var(--coral);"></div><div style="width:25%;background:var(--amber);"></div><div style="width:60%;background:var(--teal);"></div></div><span class="theme-count">161</span></div>
+              <div class="theme-row"><span class="theme-label">Safety at night</span><div class="theme-track"><div style="width:38%;background:var(--coral);"></div><div style="width:32%;background:var(--amber);"></div><div style="width:30%;background:var(--teal);"></div></div><span class="theme-count">147</span></div>
+              <div class="theme-row"><span class="theme-label">Environmental impact</span><div class="theme-track"><div style="width:8%;background:var(--coral);"></div><div style="width:22%;background:var(--amber);"></div><div style="width:70%;background:var(--teal);"></div></div><span class="theme-count">98</span></div>
+              <div class="theme-row"><span class="theme-label">Disability access</span><div class="theme-track"><div style="width:42%;background:var(--coral);"></div><div style="width:28%;background:var(--amber);"></div><div style="width:30%;background:var(--teal);"></div></div><span class="theme-count">89</span></div>
+            </div>
+          </div>
+
+          <div class="grid grid-2" style="align-content:start;">
+            <div class="card evidence-card">
+              <span class="badge badge-coral">Critical</span>
+              <p class="evidence-quote">If fares go up again, I genuinely can't afford to commute to campus four times a week anymore.</p>
+              <div class="evidence-meta"><span class="evidence-source">Student · Sector G-9</span><span class="badge badge-neutral">Fare affordability</span></div>
+            </div>
+            <div class="card evidence-card">
+              <span class="badge badge-amber">Concerned</span>
+              <p class="evidence-quote">The new feeder routes look good on paper, but my street still isn't within walking distance of any stop.</p>
+              <div class="evidence-meta"><span class="evidence-source">Resident · Sector F-11</span><span class="badge badge-neutral">Last-mile connectivity</span></div>
+            </div>
+            <div class="card evidence-card">
+              <span class="badge badge-teal">Supportive</span>
+              <p class="evidence-quote">Adding dedicated bus lanes on the Kashmir Highway corridor is exactly the kind of investment we've needed for years.</p>
+              <div class="evidence-meta"><span class="evidence-source">Small business owner</span><span class="badge badge-neutral">Route accessibility</span></div>
+            </div>
+            <div class="card evidence-card">
+              <span class="badge badge-coral">Critical</span>
+              <p class="evidence-quote">There is no mention anywhere of audio announcements or ramps — this policy was clearly not written with blind or wheelchair users in mind.</p>
+              <div class="evidence-meta"><span class="evidence-source">Disability advocate</span><span class="badge badge-neutral">Disability access</span></div>
+            </div>
+            <div class="card evidence-card">
+              <span class="badge badge-amber">Concerned</span>
+              <p class="evidence-quote">Waiting alone at the Blue Area stop after 9pm does not feel safe, policy or no policy.</p>
+              <div class="evidence-meta"><span class="evidence-source">Working professional</span><span class="badge badge-neutral">Safety at night</span></div>
+            </div>
+            <div class="card evidence-card">
+              <span class="badge badge-teal">Supportive</span>
+              <p class="evidence-quote">Electrifying even a third of the fleet by 2028 would meaningfully cut the smog we deal with every winter.</p>
+              <div class="evidence-meta"><span class="evidence-source">Environmental NGO</span><span class="badge badge-neutral">Environmental impact</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ AI AGENT INTELLIGENCE ============ -->
+      <section class="view-section" id="agent-intelligence">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Command Center</span>
+            <h2>AI Agent Intelligence</h2>
+            <p class="section-sub">Six specialist agents work in parallel over the submission corpus, each producing evidence-linked findings that route into a Synthesis Agent for cross-validation.</p>
+          </div>
+          <span class="live-badge" style="margin-left:0;"><span class="live-dot"></span>processing batch 14/18</span>
+        </div>
+
+        <div class="card">
+          <div class="orchestration-wrap">
+            <svg viewBox="0 0 760 230" style="width:100%;max-width:760px;height:auto;">
+              <defs>
+                <linearGradient id="edgeGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#4F7CFF" stop-opacity="0.55"/>
+                  <stop offset="100%" stop-color="#8C6CFF" stop-opacity="0.15"/>
+                </linearGradient>
+              </defs>
+              <g stroke="url(#edgeGrad)" stroke-width="1.5" fill="none">
+                <path d="M120,40 C260,40 280,115 380,115"/>
+                <path d="M120,115 C260,115 280,115 380,115"/>
+                <path d="M120,190 C260,190 280,115 380,115"/>
+                <path d="M120,77 C260,77 280,115 380,115"/>
+                <path d="M120,152 C260,152 280,115 380,115"/>
+                <path d="M380,115 C500,115 520,115 640,115"/>
+              </g>
+              <g font-family="JetBrains Mono" font-size="10.5" fill="#9FACC9">
+                <g><circle cx="120" cy="40" r="26" fill="#0D1729" stroke="#2BE6C4" stroke-width="1.5"/><text x="120" y="44" text-anchor="middle" fill="#EEF2FC" font-size="14">&#128202;</text><text x="120" y="78" text-anchor="middle">Sentiment</text></g>
+                <g><circle cx="120" cy="77" r="26" fill="#0D1729" stroke="#4F7CFF" stroke-width="1.5"/><text x="120" y="81" text-anchor="middle" fill="#EEF2FC" font-size="14">&#129516;</text><text x="120" y="115" text-anchor="middle">Themes</text></g>
+                <g><circle cx="120" cy="115" r="26" fill="#0D1729" stroke="#8C6CFF" stroke-width="1.5"/><text x="120" y="119" text-anchor="middle" fill="#EEF2FC" font-size="14">&#9878;</text><text x="120" y="153" text-anchor="middle">Equity</text></g>
+                <g><circle cx="120" cy="152" r="26" fill="#0D1729" stroke="#FFB454" stroke-width="1.5"/><text x="120" y="156" text-anchor="middle" fill="#EEF2FC" font-size="14">&#9888;</text><text x="120" y="190" text-anchor="middle">Risk</text></g>
+                <g><circle cx="120" cy="190" r="26" fill="#0D1729" stroke="#4F7CFF" stroke-width="1.5"/><text x="120" y="194" text-anchor="middle" fill="#EEF2FC" font-size="14">&#128204;</text><text x="120" y="228" text-anchor="middle">Alignment</text></g>
+                <g><circle cx="380" cy="115" r="32" fill="#13203A" stroke="#2BE6C4" stroke-width="2"/><text x="380" y="120" text-anchor="middle" fill="#EEF2FC" font-size="15">&#9881;</text><text x="380" y="160" text-anchor="middle" fill="#EEF2FC" font-weight="600">Synthesis</text></g>
+                <g><circle cx="640" cy="115" r="28" fill="#0D1729" stroke="#8C6CFF" stroke-width="1.5"/><text x="640" y="120" text-anchor="middle" fill="#EEF2FC" font-size="15">&#128196;</text><text x="640" y="158" text-anchor="middle" fill="#EEF2FC">Brief</text></g>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div class="grid grid-3" id="agent-cards"></div>
+
+        <div class="card">
+          <div class="flex-between">
+            <h3 style="font-size:15px;">Live Reasoning Feed</h3>
+            <span class="badge badge-neutral mono">auto-scroll</span>
+          </div>
+          <div class="feed-terminal mt-3 live-feed" id="agent-feed"></div>
+        </div>
+      </section>
+
+      <!-- ============ GAP INTELLIGENCE ============ -->
+      <section class="view-section" id="gap-intelligence">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Alignment Diagnostics</span>
+            <h2>Gap Intelligence</h2>
+            <p class="section-sub">Cross-referencing every clause of the draft policy against what residents actually said, to surface where the document and the public diverge.</p>
+          </div>
+        </div>
+
+        <div class="grid" style="grid-template-columns:1.5fr 1fr;">
+          <div class="card" style="overflow-x:auto;">
+            <table class="gap-table">
+              <thead><tr><th>Policy Section</th><th>Public Concern</th><th>Alignment</th><th>Status</th><th>Evidence</th></tr></thead>
+              <tbody>
+                <tr><td class="gap-section-name">3.1 — Fare Structure</td><td><span class="badge badge-coral">High</span></td><td><span class="mini-bar"><i style="width:34%;background:var(--coral);"></i></span>34%</td><td><span class="badge badge-coral">Gap</span></td><td class="mono">42 quotes</td></tr>
+                <tr><td class="gap-section-name">4.2 — Route Network</td><td><span class="badge badge-amber">Medium</span></td><td><span class="mini-bar"><i style="width:58%;background:var(--amber);"></i></span>58%</td><td><span class="badge badge-amber">Partial</span></td><td class="mono">31 quotes</td></tr>
+                <tr><td class="gap-section-name">5.4 — Accessibility Standards</td><td><span class="badge badge-coral">High</span></td><td><span class="mini-bar"><i style="width:29%;background:var(--coral);"></i></span>29%</td><td><span class="badge badge-coral">Gap</span></td><td class="mono">27 quotes</td></tr>
+                <tr><td class="gap-section-name">6.1 — Safety Provisions</td><td><span class="badge badge-amber">Medium</span></td><td><span class="mini-bar"><i style="width:54%;background:var(--amber);"></i></span>54%</td><td><span class="badge badge-amber">Partial</span></td><td class="mono">24 quotes</td></tr>
+                <tr><td class="gap-section-name">7.0 — Fleet Electrification</td><td><span class="badge badge-teal">Low</span></td><td><span class="mini-bar"><i style="width:81%;background:var(--teal);"></i></span>81%</td><td><span class="badge badge-teal">Aligned</span></td><td class="mono">18 quotes</td></tr>
+                <tr><td class="gap-section-name">8.3 — Public Reporting</td><td><span class="badge badge-teal">Low</span></td><td><span class="mini-bar"><i style="width:76%;background:var(--teal);"></i></span>76%</td><td><span class="badge badge-teal">Aligned</span></td><td class="mono">11 quotes</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <h3 style="font-size:15px;">Alignment Breakdown</h3>
+            <div class="mt-3" style="display:flex;flex-direction:column;gap:13px;">
+              <div><div class="flex-between" style="margin-bottom:5px;"><span style="font-size:12.5px;color:var(--text-2);">Affordability</span><span class="mono" style="font-size:11.5px;">38%</span></div><div class="score-bar"><i style="width:38%;background:var(--coral);"></i></div></div>
+              <div><div class="flex-between" style="margin-bottom:5px;"><span style="font-size:12.5px;color:var(--text-2);">Accessibility</span><span class="mono" style="font-size:11.5px;">44%</span></div><div class="score-bar"><i style="width:44%;background:var(--coral);"></i></div></div>
+              <div><div class="flex-between" style="margin-bottom:5px;"><span style="font-size:12.5px;color:var(--text-2);">Safety</span><span class="mono" style="font-size:11.5px;">61%</span></div><div class="score-bar"><i style="width:61%;background:var(--amber);"></i></div></div>
+              <div><div class="flex-between" style="margin-bottom:5px;"><span style="font-size:12.5px;color:var(--text-2);">Sustainability</span><span class="mono" style="font-size:11.5px;">79%</span></div><div class="score-bar"><i style="width:79%;background:var(--teal);"></i></div></div>
+              <div><div class="flex-between" style="margin-bottom:5px;"><span style="font-size:12.5px;color:var(--text-2);">Transparency</span><span class="mono" style="font-size:11.5px;">74%</span></div><div class="score-bar"><i style="width:74%;background:var(--teal);"></i></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="flex-between"><h3 style="font-size:14.5px;">3.1 — Fare Structure</h3><span class="badge badge-coral">Critical Gap</span></div>
+            <div class="grid grid-2 mt-3" style="gap:14px;">
+              <div class="card-flat"><span class="eyebrow">What the policy says</span><p style="font-size:13px;color:var(--text-2);margin-top:8px;line-height:1.6;">Fares will be adjusted annually in line with the Consumer Price Index, with no exemption tiers specified.</p></div>
+              <div class="card-flat"><span class="eyebrow">What the public says</span><p class="evidence-quote" style="font-size:13px;margin-top:8px;">Students and daily-wage commuters need a discounted fare tier — flat CPI increases hit us hardest.</p></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="flex-between"><h3 style="font-size:14.5px;">5.4 — Accessibility Standards</h3><span class="badge badge-coral">Critical Gap</span></div>
+            <div class="grid grid-2 mt-3" style="gap:14px;">
+              <div class="card-flat"><span class="eyebrow">What the policy says</span><p style="font-size:13px;color:var(--text-2);margin-top:8px;line-height:1.6;">Vehicles will meet "reasonable accessibility provisions" at the operator's discretion.</p></div>
+              <div class="card-flat"><span class="eyebrow">What the public says</span><p class="evidence-quote" style="font-size:13px;margin-top:8px;">"Reasonable" isn't a standard — we need mandatory ramps and audio stop announcements on every vehicle.</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ POLICY REVISION ENGINE ============ -->
+      <section class="view-section" id="revision-engine">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Drafting Assistant</span>
+            <h2>Policy Revision Engine</h2>
+            <p class="section-sub">For every identified gap, the Synthesis Agent proposes a revised clause — each suggestion cites the evidence that justifies it and waits for reviewer sign-off.</p>
+          </div>
+        </div>
+
+        <div class="revision-layout">
+          <div class="card">
+            <h3 style="font-size:13px;margin-bottom:10px;">Clauses (12)</h3>
+            <div class="clause-list">
+              <div class="clause-item is-active"><div class="clause-item-title">3.1 — Fare Structure</div><div class="clause-item-tag">Confidence 91% · Critical gap</div></div>
+              <div class="clause-item"><div class="clause-item-title">4.2 — Route Network</div><div class="clause-item-tag">Confidence 84% · Partial gap</div></div>
+              <div class="clause-item"><div class="clause-item-title">5.4 — Accessibility</div><div class="clause-item-tag">Confidence 93% · Critical gap</div></div>
+              <div class="clause-item"><div class="clause-item-title">6.1 — Safety Provisions</div><div class="clause-item-tag">Confidence 77% · Partial gap</div></div>
+              <div class="clause-item"><div class="clause-item-title">7.0 — Fleet Electrification</div><div class="clause-item-tag">Confidence 68% · Aligned</div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="flex-between">
+              <div>
+                <span class="badge badge-coral">Critical Gap</span>
+                <h3 style="font-size:16px;margin-top:8px;">3.1 — Fare Structure</h3>
+              </div>
+              <div class="rec-conf"><b>91%</b><span>Rec. confidence</span></div>
+            </div>
+
+            <div class="diff-cols mt-3">
+              <div class="diff-pane">
+                <span class="diff-pane-label">Current clause</span>
+                <p class="diff-text">Fares will be adjusted annually in line with the Consumer Price Index<del>, with no exemption tiers specified</del>.</p>
+              </div>
+              <div class="diff-pane">
+                <span class="diff-pane-label">AI-suggested revision</span>
+                <p class="diff-text">Fares will be adjusted annually in line with the Consumer Price Index<ins>, with a discounted concessionary tier of at least 30% for students and verified low-income commuters, reviewed every two years</ins>.</p>
+              </div>
+            </div>
+
+            <div class="card-flat mt-3">
+              <span class="eyebrow">Supporting evidence</span>
+              <p class="evidence-quote mt-2" style="font-size:13px;">If fares go up again, I genuinely can't afford to commute to campus four times a week anymore.</p>
+              <div class="evidence-meta mt-1"><span class="evidence-source">Student · Sector G-9 · 1 of 42 similar submissions</span><span class="badge badge-blue" style="cursor:pointer;" onclick="goTo('public-voice')">View all 42 &#8594;</span></div>
+            </div>
+
+            <div class="revision-actions">
+              <button class="btn btn-accept">Accept revision</button>
+              <button class="btn btn-reject">Reject</button>
+              <button class="btn btn-ghost">Edit manually</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ EXECUTIVE DECISION BRIEF ============ -->
+      <section class="view-section" id="executive-brief">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Final Output</span>
+            <h2>Executive Decision Brief</h2>
+            <p class="section-sub">A council-ready summary synthesizing every agent's findings into a single decision document, fully traceable back to public evidence.</p>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-ghost">Schedule review</button>
+            <button class="btn btn-primary">Export as PDF</button>
+          </div>
+        </div>
+
+        <div class="brief-doc">
+          <div class="brief-letterhead">
+            <div>
+              <div class="eyebrow" style="margin-bottom:8px;">Metro City Council · Transit Authority</div>
+              <div class="brief-title">Draft Urban Mobility &amp; Transit Policy 2026 — Consultation Findings</div>
+            </div>
+            <div class="brief-class">
+              CLASSIFICATION: Internal — Decision Support<br>
+              PREPARED BY: PolicyPulse AI Multi-Agent System<br>
+              DATE: June 17, 2026 · v3
+            </div>
+          </div>
+
+          <p class="brief-summary">
+            Across 1,284 public submissions, support for the policy's sustainability and transparency provisions is strong, but fare structure and accessibility language remain significant points of friction. The current draft scores 78/100 on overall policy health, while public trust has slipped to 61/100 — primarily driven by perceived inflexibility on fare exemptions and vague accessibility commitments. Six AI agents identified eight section-level gaps; two are rated critical. The revision engine has produced confidence-scored language for all eight, with the fare exemption and accessibility clauses carrying the strongest evidentiary backing.
+          </p>
+
+          <div class="grid grid-4 mt-3" style="margin-top:var(--sp-5);">
+            <div class="card-flat"><span class="score-name">Policy Health</span><div class="score-num" style="font-size:26px;margin-top:4px;">78</div></div>
+            <div class="card-flat"><span class="score-name">Public Trust</span><div class="score-num" style="font-size:26px;margin-top:4px;">61</div></div>
+            <div class="card-flat"><span class="score-name">Alignment</span><div class="score-num" style="font-size:26px;margin-top:4px;">66</div></div>
+            <div class="card-flat"><span class="score-name">Rec. Confidence</span><div class="score-num" style="font-size:26px;margin-top:4px;">87</div></div>
+          </div>
+
+          <h3 style="font-size:15px;margin-top:var(--sp-6);margin-bottom:var(--sp-3);">Risk Matrix</h3>
+          <div class="risk-matrix-wrap" id="risk-matrix-brief"></div>
+
+          <h3 style="font-size:15px;margin-top:var(--sp-6);margin-bottom:6px;">Top Recommendations</h3>
+          <div>
+            <div class="rec-item">
+              <div class="rec-rank">01</div>
+              <div><div class="rec-title">Introduce a 30% concessionary fare tier for students and verified low-income commuters</div><div class="rec-evidence">"If fares go up again, I genuinely can't afford to commute to campus..." — 42 similar submissions</div></div>
+              <div class="rec-conf"><b>91%</b><span>Confidence</span></div>
+            </div>
+            <div class="rec-item">
+              <div class="rec-rank">02</div>
+              <div><div class="rec-title">Replace "reasonable accessibility provisions" with mandatory ramp and audio-announcement standards</div><div class="rec-evidence">"'Reasonable' isn't a standard — we need mandatory ramps..." — 27 similar submissions</div></div>
+              <div class="rec-conf"><b>93%</b><span>Confidence</span></div>
+            </div>
+            <div class="rec-item">
+              <div class="rec-rank">03</div>
+              <div><div class="rec-title">Add lighting and staffed-hours commitments for stops flagged as unsafe after dark</div><div class="rec-evidence">"Waiting alone at the Blue Area stop after 9pm does not feel safe..." — 24 similar submissions</div></div>
+              <div class="rec-conf"><b>77%</b><span>Confidence</span></div>
+            </div>
+            <div class="rec-item" style="border-bottom:none;">
+              <div class="rec-rank">04</div>
+              <div><div class="rec-title">Publish a public feeder-route map before final approval to close last-mile connectivity concerns</div><div class="rec-evidence">"The new feeder routes look good on paper, but my street still isn't..." — 31 similar submissions</div></div>
+              <div class="rec-conf"><b>84%</b><span>Confidence</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- SURVEY GENERATOR MODAL -->
+<div class="modal-overlay" id="survey-modal">
+  <div class="modal-panel">
+    <div class="modal-head">
+      <div>
+        <span class="eyebrow">Consultation Survey Generator</span>
+        <h2 style="font-size:19px;margin-top:4px;">Draft a follow-up survey</h2>
+      </div>
+      <button class="modal-close" id="close-survey">&#10005;</button>
+    </div>
+    <p class="section-sub" style="margin-bottom:var(--sp-4);">Generated from the two highest-confidence gaps — fare structure and accessibility — to validate proposed revisions directly with affected residents.</p>
+    <div id="survey-body">
+      <div class="survey-q"><span class="survey-q-idx">01</span><div><div class="survey-q-text">How strongly would a 30% concessionary fare tier for students and low-income commuters address your concerns about cost?</div><div class="survey-q-type">Likert scale · 1–5</div></div></div>
+      <div class="survey-q"><span class="survey-q-idx">02</span><div><div class="survey-q-text">Which accessibility features matter most to you on daily transit? (select up to 3)</div><div class="survey-q-type">Multiple choice</div></div></div>
+      <div class="survey-q"><span class="survey-q-idx">03</span><div><div class="survey-q-text">Describe any specific stop or route where you've experienced an accessibility barrier.</div><div class="survey-q-type">Open response</div></div></div>
+      <div class="survey-q"><span class="survey-q-idx">04</span><div><div class="survey-q-text">How safe do you feel waiting at transit stops after 8pm?</div><div class="survey-q-type">Likert scale · 1–5</div></div></div>
+      <div class="survey-q" style="border-bottom:none;"><span class="survey-q-idx">05</span><div><div class="survey-q-text">Which stakeholder group best describes you?</div><div class="survey-q-type">Multiple choice</div></div></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:var(--sp-5);">
+      <button class="btn btn-ghost" id="regenerate-survey">Regenerate questions</button>
+      <button class="btn btn-primary">Publish to Google Forms</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===================== NETWORK BACKGROUND ===================== */
+(function(){
+  const canvas = document.getElementById('network-bg');
+  const ctx = canvas.getContext('2d');
+  let w, h;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function resize(){ w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+
+  const COUNT = Math.max(28, Math.min(70, Math.floor((window.innerWidth*window.innerHeight)/24000)));
+  const nodes = [];
+  for(let i=0;i<COUNT;i++){
+    nodes.push({ x:Math.random()*w, y:Math.random()*h, vx:(Math.random()-0.5)*0.18, vy:(Math.random()-0.5)*0.18, r:Math.random()*1.4+0.7 });
+  }
+  const MAXD = 150;
+  const pulses = [];
+  function spawnPulse(){
+    if(reduceMotion) return;
+    const a = nodes[Math.floor(Math.random()*nodes.length)];
+    const cand = nodes.filter(n => n!==a && Math.hypot(n.x-a.x, n.y-a.y) < MAXD);
+    if(!cand.length) return;
+    const b = cand[Math.floor(Math.random()*cand.length)];
+    pulses.push({a, b, t:0});
+  }
+  setInterval(spawnPulse, 650);
+
+  function tick(){
+    ctx.clearRect(0,0,w,h);
+    for(let i=0;i<nodes.length;i++){
+      for(let j=i+1;j<nodes.length;j++){
+        const n1=nodes[i], n2=nodes[j];
+        const d = Math.hypot(n1.x-n2.x, n1.y-n2.y);
+        if(d<MAXD){
+          ctx.strokeStyle = 'rgba(99,140,255,'+(0.09*(1-d/MAXD))+')';
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(n1.x,n1.y); ctx.lineTo(n2.x,n2.y); ctx.stroke();
+        }
+      }
+    }
+    for(let i=pulses.length-1;i>=0;i--){
+      const p = pulses[i]; p.t += 0.018;
+      if(p.t>=1){ pulses.splice(i,1); continue; }
+      const x = p.a.x+(p.b.x-p.a.x)*p.t, y = p.a.y+(p.b.y-p.a.y)*p.t;
+      ctx.beginPath(); ctx.fillStyle='rgba(120,160,255,0.95)'; ctx.arc(x,y,2.1,0,Math.PI*2); ctx.fill();
+    }
+    for(const n of nodes){
+      ctx.beginPath(); ctx.fillStyle='rgba(160,190,255,0.55)'; ctx.arc(n.x,n.y,n.r,0,Math.PI*2); ctx.fill();
+      if(!reduceMotion){
+        n.x+=n.vx; n.y+=n.vy;
+        if(n.x<0||n.x>w) n.vx*=-1;
+        if(n.y<0||n.y>h) n.vy*=-1;
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+
+/* ===================== NAVIGATION ===================== */
+function goTo(id){
+  document.querySelectorAll('.view-section').forEach(s=>s.classList.remove('is-active'));
+  const target = document.getElementById(id);
+  if(target) target.classList.add('is-active');
+  document.querySelectorAll('.nav-step').forEach(n=>n.classList.remove('is-active'));
+  const navItem = document.querySelector('.nav-step[data-target="'+id+'"]');
+  if(navItem){
+    navItem.classList.add('is-active');
+    document.getElementById('breadcrumb-current').textContent = navItem.dataset.label;
+  }
+}
+document.querySelectorAll('.nav-step, .tool-link[data-target]').forEach(item=>{
+  item.addEventListener('click', ()=>{
+    const id = item.dataset.target;
+    if(id) goTo(id);
+  });
+});
+
+/* ===================== SCORE COUNT-UP ===================== */
+function animateValue(el, end, duration){
+  const start = performance.now();
+  function step(now){
+    const p = Math.min((now-start)/duration, 1);
+    el.textContent = Math.floor(end*p);
+    if(p<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+document.querySelectorAll('[data-countup]').forEach(el=>{
+  animateValue(el, parseInt(el.dataset.countup,10), 1100);
+});
+
+/* ===================== RISK MATRIX ===================== */
+function renderRiskMatrix(containerId){
+  const wrap = document.getElementById(containerId);
+  if(!wrap) return;
+  const risks = [
+    {name:'Fare equity backlash', x:4, y:4, level:'high'},
+    {name:'Accessibility non-compliance complaints', x:3, y:4, level:'high'},
+    {name:'Night-safety incident at unstaffed stops', x:2, y:3, level:'med'},
+    {name:'Feeder route delay backlash', x:1, y:2, level:'med'},
+    {name:'Driver shortage on new routes', x:1, y:1, level:'low'},
+    {name:'Public records request surge', x:0, y:1, level:'low'},
+    {name:'Electrification budget overrun', x:2, y:1, level:'med'},
+    {name:'Negative press cycle pre-vote', x:3, y:2, level:'med'}
+  ];
+  const colorFor = (col,row)=>{
+    const sev = col+row;
+    if(sev>=6) return 'rgba(255,107,107,0.34)';
+    if(sev>=4) return 'rgba(255,180,84,0.30)';
+    if(sev>=2) return 'rgba(255,180,84,0.14)';
+    return 'rgba(43,230,196,0.16)';
+  };
+  let cells = '';
+  for(let row=4; row>=0; row--){
+    for(let col=0; col<5; col++){
+      cells += '<div class="risk-cell" style="background:'+colorFor(col,row)+';" data-col="'+col+'" data-row="'+row+'"></div>';
+    }
+  }
+  const axisY = '<div class="risk-axis-y"><span>Low</span><span></span><span>Med</span><span></span><span>High</span></div>';
+  const axisX = '<div class="risk-axis-x"><span>Low</span><span></span><span>Med</span><span></span><span>High</span></div>';
+  wrap.innerHTML =
+    '<div>'+
+      '<div class="risk-axes-block">'+axisY+'<div><div class="risk-grid">'+cells+'</div>'+axisX+
+        '<div class="muted mono" style="font-size:10px;margin-top:4px;margin-left:24px;">IMPACT &#8594;</div></div></div>'+
+    '</div>'+
+    '<div class="risk-legend" id="'+containerId+'-legend"></div>';
+
+  const grid = wrap.querySelector('.risk-grid');
+  risks.forEach(r=>{
+    const cell = grid.children[(4-r.y)*5 + r.x];
+    if(!cell) return;
+    const dot = document.createElement('div');
+    dot.className = 'risk-dot';
+    dot.title = r.name;
+    dot.style.background = r.level==='high' ? 'var(--coral)' : r.level==='med' ? 'var(--amber)' : 'var(--teal)';
+    cell.appendChild(dot);
+  });
+  const legend = document.getElementById(containerId+'-legend');
+  legend.innerHTML = risks.map(r=>(
+    '<div class="risk-legend-row"><span class="risk-legend-sw" style="background:'+(r.level==='high'?'var(--coral)':r.level==='med'?'var(--amber)':'var(--teal)')+';"></span>'+r.name+'</div>'
+  )).join('');
+}
+renderRiskMatrix('risk-matrix-mc');
+renderRiskMatrix('risk-matrix-brief');
+
+/* ===================== AGENT CARDS ===================== */
+const AGENTS = [
+  {name:'Sentiment Agent', role:'Classifies emotional tone per submission', icon:'&#128202;', color:'var(--teal)', bg:'var(--teal-soft)', status:'Running', conf:94, log:'Scoring batch 14/18 — 61% supportive overall.'},
+  {name:'Theme Extraction Agent', role:'Clusters recurring topics across comments', icon:'&#129516;', color:'var(--blue)', bg:'var(--blue-soft)', status:'Running', conf:89, log:'New cluster surfaced: "feeder route timing".'},
+  {name:'Equity & Inclusion Agent', role:'Flags underrepresented voices and accessibility gaps', icon:'&#9878;', color:'var(--violet)', bg:'var(--violet-soft)', status:'Running', conf:91, log:'Rural commuters remain <4% of respondents.'},
+  {name:'Risk Assessment Agent', role:'Scores likelihood and impact of backlash scenarios', icon:'&#9888;', color:'var(--amber)', bg:'var(--amber-soft)', status:'Running', conf:85, log:'Fare equity risk escalated to High.'},
+  {name:'Policy Alignment Agent', role:'Compares draft clauses against public sentiment', icon:'&#128204;', color:'var(--blue)', bg:'var(--blue-soft)', status:'Running', conf:88, log:'Section 6.1 alignment recalculated: 54%.'},
+  {name:'Synthesis Agent', role:'Cross-validates findings and drafts the executive brief', icon:'&#9881;', color:'var(--teal)', bg:'var(--teal-soft)', status:'Drafting', conf:96, log:'Incorporating 6 new evidence citations.'}
+];
+const agentCardsEl = document.getElementById('agent-cards');
+if(agentCardsEl){
+  agentCardsEl.innerHTML = AGENTS.map(a=>(
+    '<div class="card agent-card">'+
+      '<div class="agent-top">'+
+        '<div class="agent-icon" style="background:'+a.bg+';">'+a.icon+'</div>'+
+        '<div><div class="agent-name">'+a.name+'</div><div class="agent-role">'+a.role+'</div></div>'+
+      '</div>'+
+      '<div class="agent-status-row"><span class="badge badge-teal">'+a.status+'</span><span class="mono muted" style="font-size:11px;">'+a.conf+'% confidence</span></div>'+
+      '<div class="confidence-row"><div class="confidence-track"><div class="confidence-fill" style="width:'+a.conf+'%;background:'+a.color+';"></div></div></div>'+
+      '<div class="agent-log" data-agent-log="'+a.name+'">'+a.log+'</div>'+
+    '</div>'
+  )).join('');
+}
+
+/* ===================== LIVE FEED SIMULATION ===================== */
+const FEED_LINES = [
+  {agent:'Sentiment Agent', color:'var(--teal)', line:'Classified 142 new comments — 61% supportive, 22% concerned, 17% critical.'},
+  {agent:'Theme Extraction Agent', color:'var(--blue)', line:'Surfaced theme cluster "last-mile connectivity" — 38 mentions, trending up.'},
+  {agent:'Equity & Inclusion Agent', color:'var(--violet)', line:'Flagged underrepresentation: rural commuters under 4% of total responses.'},
+  {agent:'Risk Assessment Agent', color:'var(--amber)', line:'Risk score for Section 4.2 (Fare Restructuring) escalated to High.'},
+  {agent:'Policy Alignment Agent', color:'var(--blue)', line:'Section 6.1 alignment recalculated at 54% — marked Partial.'},
+  {agent:'Synthesis Agent', color:'var(--teal)', line:'Drafting executive brief — incorporating 6 new evidence citations.'},
+  {agent:'Sentiment Agent', color:'var(--teal)', line:'Sentiment on Section 7.0 (Electrification) holding steady at 81% positive.'},
+  {agent:'Theme Extraction Agent', color:'var(--blue)', line:'Theme "disability access" crossed 89 mentions — promoted to priority cluster.'},
+  {agent:'Risk Assessment Agent', color:'var(--amber)', line:'New risk identified: night-safety incidents at unstaffed stops.'},
+  {agent:'Policy Alignment Agent', color:'var(--blue)', line:'Cross-checking Section 8.3 reporting language against transparency requests.'},
+  {agent:'Equity & Inclusion Agent', color:'var(--violet)', line:'Cross-referencing accessibility complaints with Section 5.4 language.'},
+  {agent:'Synthesis Agent', color:'var(--teal)', line:'Recommendation confidence for fare exemption clause reached 91%.'}
+];
+let feedIdx = 0;
+function pushFeed(){
+  const entry = FEED_LINES[feedIdx % FEED_LINES.length];
+  feedIdx++;
+  const time = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  const rowHTML = '<div class="feed-row"><span class="feed-time">'+time+'</span><span class="feed-agent" style="color:'+entry.color+';">'+entry.agent+'</span><span class="feed-line">'+entry.line+'</span></div>';
+  document.querySelectorAll('.live-feed').forEach(feed=>{
+    feed.insertAdjacentHTML('afterbegin', rowHTML);
+    while(feed.children.length>30) feed.removeChild(feed.lastChild);
+  });
+  const logTarget = document.querySelector('[data-agent-log="'+entry.agent+'"]');
+  if(logTarget) logTarget.textContent = entry.line;
+}
+pushFeed();
+setInterval(pushFeed, 2400);
+
+/* ===================== CLAUSE LIST (Revision Engine) ===================== */
+document.querySelectorAll('.clause-item').forEach(item=>{
+  item.addEventListener('click', ()=>{
+    document.querySelectorAll('.clause-item').forEach(c=>c.classList.remove('is-active'));
+    item.classList.add('is-active');
+  });
+});
+
+/* ===================== SURVEY GENERATOR MODAL ===================== */
+const surveyModal = document.getElementById('survey-modal');
+document.getElementById('open-survey-generator').addEventListener('click', ()=>{
+  surveyModal.classList.add('is-open');
+});
+document.getElementById('close-survey').addEventListener('click', ()=>{
+  surveyModal.classList.remove('is-open');
+});
+surveyModal.addEventListener('click', (e)=>{
+  if(e.target === surveyModal) surveyModal.classList.remove('is-open');
+});
+
+const SURVEY_POOLS = [
+  {q:'How strongly would a 30% concessionary fare tier for students and low-income commuters address your concerns about cost?', t:'Likert scale · 1–5'},
+  {q:'Which accessibility features matter most to you on daily transit? (select up to 3)', t:'Multiple choice'},
+  {q:'Describe any specific stop or route where you\'ve experienced an accessibility barrier.', t:'Open response'},
+  {q:'How safe do you feel waiting at transit stops after 8pm?', t:'Likert scale · 1–5'},
+  {q:'Which stakeholder group best describes you?', t:'Multiple choice'},
+  {q:'How clear is the published feeder-route map for your neighborhood?', t:'Likert scale · 1–5'},
+  {q:'What single change would most improve your daily commute under this policy?', t:'Open response'},
+  {q:'How often do you currently rely on public transit per week?', t:'Multiple choice'}
+];
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+document.getElementById('regenerate-survey').addEventListener('click', ()=>{
+  const body = document.getElementById('survey-body');
+  body.innerHTML = Array.from({length:5}).map(()=>'<div class="shimmer-line" style="width:'+(60+Math.random()*35)+'%;"></div><div class="shimmer-line" style="width:30%;height:10px;margin-bottom:16px;"></div>').join('');
+  setTimeout(()=>{
+    const picked = shuffle(SURVEY_POOLS).slice(0,5);
+    body.innerHTML = picked.map((item,i)=>(
+      '<div class="survey-q" style="'+(i===picked.length-1?'border-bottom:none;':'')+'"><span class="survey-q-idx">0'+(i+1)+'</span><div><div class="survey-q-text">'+item.q+'</div><div class="survey-q-type">'+item.t+'</div></div></div>'
+    )).join('');
+  }, 850);
+});
+//==SCRIPT==
+</script>
+</body>
+</html>
