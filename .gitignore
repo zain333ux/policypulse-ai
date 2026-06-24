@@ -216,3 +216,20 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+playwright-report/
+test-results/
+
+# Local third-party design reference toolkit
+/ui-ux-pro-max-skill-main/
+
+# Local development output
+*-dev.stdout.log
+*-dev.stderr.log
+.streamlit-stdout.log
+.streamlit-stderr.log

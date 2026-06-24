@@ -1412,6 +1412,9 @@ if 'demo_policy' not in st.session_state:
     st.session_state['demo_policy'] = ""
 if 'demo_comments' not in st.session_state:
     st.session_state['demo_comments'] = ""
+if 'google_form_id' not in st.session_state:
+    st.session_state['google_form_id'] = ""
+
 
 # ==========================================
 # SIDEBAR
@@ -1632,6 +1635,59 @@ with col2:
                                        value=st.session_state['demo_comments'],
                                        height=160,
                                        placeholder="I don't agree with the current rules...\nThis policy doesn't handle exemptions...")
+
+        # Fetch comments from Google Form Responses
+        st.markdown('<div style="border-top:1px solid rgba(255,255,255,0.06); margin:12px 0;"></div>', unsafe_allow_html=True)
+        st.caption("⚡ Or fetch live responses from your deployed Google Form:")
+        
+        form_id_input = st.text_input("Google Form ID", value=st.session_state['google_form_id'], key="form_id_sync_input", label_visibility="collapsed", placeholder="Enter Google Form ID...")
+        
+        if st.button("📥 Fetch Google Form Responses", use_container_width=True):
+            if not form_id_input.strip():
+                st.warning("Please enter a valid Google Form ID.")
+            else:
+                with st.spinner("Fetching live comments from Google Sheets via Apps Script..."):
+                    fetch_res = survey_agent.fetch_form_responses(form_id_input.strip())
+                    if fetch_res.get("csv"):
+                        csv_data = fetch_res["csv"]
+                        try:
+                            import pandas as pd
+                            import io
+                            df = pd.read_csv(io.StringIO(csv_data))
+                            
+                            # Search for comments column
+                            target_col = None
+                            possible_columns = ['comment', 'comments', 'feedback', 'text', 'review', 'reviews', 'response', 'responses', 'content', 'message', 'messages']
+                            normalized_cols = {col.lower().strip(): col for col in df.columns}
+                            for col_name in possible_columns:
+                                if col_name in normalized_cols:
+                                    target_col = normalized_cols[col_name]
+                                    break
+                            
+                            # Fallback to last column or any string column if not found
+                            if target_col is None and not df.empty:
+                                string_cols = [c for c in df.columns if df[c].dtype == object]
+                                string_cols = [c for c in string_cols if c.lower() != 'timestamp']
+                                if string_cols:
+                                    target_col = string_cols[0]
+                                else:
+                                    target_col = df.columns[-1]
+                            
+                            if target_col and not df.empty:
+                                comments_list = df[target_col].dropna().astype(str).tolist()
+                                st.session_state['demo_comments'] = "\n".join(comments_list)
+                                st.success(f"Successfully loaded {len(comments_list)} responses from Google Sheets!")
+                                st.rerun()
+                            else:
+                                st.session_state['demo_comments'] = csv_data
+                                st.success("Loaded raw responses successfully!")
+                                st.rerun()
+                        except Exception as parse_err:
+                            st.session_state['demo_comments'] = csv_data
+                            st.success("Loaded responses as raw text!")
+                            st.rerun()
+                    else:
+                        st.error(f"Failed to fetch responses: {fetch_res.get('error')}")
 
 # Run controls
 ctrl1, ctrl2 = st.columns(2)
@@ -2469,6 +2525,9 @@ We suggest amending the current rules framework immediately. Detailed revised wo
                         st.markdown(f"**🔗 Live Form:** [{result['url']}]({result['url']})")
                         if result.get("edit_url"):
                             st.markdown(f"**✏️ Edit Link:** [{result['edit_url']}]({result['edit_url']})")
+                        if result.get("form_id"):
+                            st.session_state['google_form_id'] = result.get("form_id")
+                            st.markdown(f"**🔑 Form ID:** `{result['form_id']}` *(populated in Comment syncing widget above)*")
                     else:
                         error_msg = result.get("error", "Unknown error")
                         st.error(f"Form creation failed: {error_msg}")

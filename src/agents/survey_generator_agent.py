@@ -1,4 +1,5 @@
 import json
+import os
 import requests
 from src.utils.llm_client import call_llm
 from src.utils.json_utils import parse_json_from_llm
@@ -67,39 +68,85 @@ Strictly follow these rules:
     except Exception:
         return fallback_data
 
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyyozQ4ZYTJh-vqG6WBuSRALepGihip6ABD-52yzBwiyZvIv0NKWBzAthC-1k_3gW6x0A/exec"
+GOOGLE_SCRIPT_URL = os.getenv("GOOGLE_SCRIPT_URL", "")
+GOOGLE_SCRIPT_SECRET = os.getenv("GOOGLE_SCRIPT_SECRET", "")
 
 def deploy_google_form(survey_json):
+    if not GOOGLE_SCRIPT_URL:
+        return {
+            "error": "Google Forms deployment is disabled. Configure GOOGLE_SCRIPT_URL and GOOGLE_SCRIPT_SECRET to enable it.",
+            "url": None,
+            "edit_url": None
+        }
     try:
-        # Map nested sections to flat questions schema expected by the Google Apps Script Web App
-        flat_questions = []
-        sections = survey_json.get("sections", [])
-        for section in sections:
-            for q in section.get("questions", []):
-                flat_questions.append({
-                    "question": q.get("question", ""),
-                    "type": q.get("type", "text"),
-                    "options": q.get("options", [])
-                })
-                
-        # If no sections but there are already flat questions (e.g. fallback or old format)
-        if not flat_questions and "questions" in survey_json:
-            flat_questions = survey_json.get("questions", [])
-            
-        flat_payload = {
-            "title": survey_json.get("title", "Policy Feedback Survey"),
-            "description": survey_json.get("description", ""),
-            "questions": flat_questions
+        payload = {
+            "action": "create_form",
+            "secret": GOOGLE_SCRIPT_SECRET,
+            "blueprint": survey_json
         }
 
         response = requests.post(
             GOOGLE_SCRIPT_URL,
-            json=flat_payload
+            json=payload,
+            timeout=30
         )
-        return response.json()
+        response.raise_for_status()
+        data = response.json()
+        if data.get("ok"):
+            deployment = data.get("deployment", {})
+            return {
+                "url": deployment.get("form_url"),
+                "edit_url": deployment.get("edit_url"),
+                "form_id": deployment.get("form_id"),
+                "csv_file_url": deployment.get("csv_file_url"),
+                "csv_export_url": deployment.get("csv_export_url"),
+                "spreadsheet_url": deployment.get("response_sheet_url"),
+                "error": None
+            }
+        else:
+            return {
+                "error": data.get("error", "Google Apps Script error"),
+                "url": None,
+                "edit_url": None
+            }
     except Exception as e:
         return {
             "error": str(e),
             "url": None,
             "edit_url": None
+        }
+
+def fetch_form_responses(form_id: str) -> dict:
+    if not GOOGLE_SCRIPT_URL:
+        return {
+            "error": "Google Forms deployment is disabled. Configure GOOGLE_SCRIPT_URL to enable fetching.",
+            "csv": None
+        }
+    try:
+        payload = {
+            "action": "get_responses",
+            "secret": GOOGLE_SCRIPT_SECRET,
+            "form_id": form_id
+        }
+        response = requests.post(
+            GOOGLE_SCRIPT_URL,
+            json=payload,
+            timeout=30
+        )
+        response.raise_for_status()
+        data = response.json()
+        if data.get("ok"):
+            return {
+                "csv": data.get("csv"),
+                "error": None
+            }
+        else:
+            return {
+                "error": data.get("error", "Failed to fetch responses from Google Forms."),
+                "csv": None
+            }
+    except Exception as e:
+        return {
+            "error": str(e),
+            "csv": None
         }
