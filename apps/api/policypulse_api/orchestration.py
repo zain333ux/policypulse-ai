@@ -128,9 +128,7 @@ async def run_langgraph_workflow(
     try:
         from langgraph.graph import END, START, StateGraph
     except ImportError as exc:  # pragma: no cover - exercised only when optional dep missing
-        raise RuntimeError(
-            "LangGraph orchestration requires the optional 'langgraph' dependency."
-        ) from exc
+        raise RuntimeError("LangGraph orchestration requires the optional 'langgraph' dependency.") from exc
 
     state = await _prepare_state(request, settings, progress, llm=llm, orchestrator="langgraph")
     graph = StateGraph(WorkflowState)

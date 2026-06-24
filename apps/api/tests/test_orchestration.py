@@ -103,10 +103,7 @@ async def _progress(stage_id: str, status: StageStatus, message: str) -> None:
 
 def _request() -> AnalysisRequest:
     return AnalysisRequest(
-        policy_text=(
-            "Students must maintain 85% attendance. "
-            "The policy does not describe exemptions or appeals."
-        ),
+        policy_text=("Students must maintain 85% attendance. The policy does not describe exemptions or appeals."),
         comments=[
             "Please add a medical appeal process.",
             "Working students need a fair appeal option.",
@@ -123,24 +120,32 @@ async def test_explicit_and_langgraph_workflows_match() -> None:
     langgraph = await run_langgraph_workflow(request, settings, _progress, llm=FakeLlm())
 
     assert explicit.policy == langgraph.policy
-    assert explicit.sentiment == langgraph.sentiment == Sentiment(
-        support=0,
-        opposition=100,
-        neutral=0,
-        overall_mood="High urgency",
-    )
-    assert explicit.concerns == langgraph.concerns == [
-        Concern(
-            id="CON-001",
-            theme="Appeals",
-            summary="Students want an appeal path.",
-            count=2,
-            percentage=100.0,
-            urgency="high",
-            evidence_ids=["COM-001", "COM-002"],
-            limited_evidence=False,
+    assert (
+        explicit.sentiment
+        == langgraph.sentiment
+        == Sentiment(
+            support=0,
+            opposition=100,
+            neutral=0,
+            overall_mood="High urgency",
         )
-    ]
+    )
+    assert (
+        explicit.concerns
+        == langgraph.concerns
+        == [
+            Concern(
+                id="CON-001",
+                theme="Appeals",
+                summary="Students want an appeal path.",
+                count=2,
+                percentage=100.0,
+                urgency="high",
+                evidence_ids=["COM-001", "COM-002"],
+                limited_evidence=False,
+            )
+        ]
+    )
     assert explicit.gaps == langgraph.gaps
     assert explicit.recommendations == langgraph.recommendations
     assert "explicit Python workflow" in explicit.methodology
