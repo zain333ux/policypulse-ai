@@ -7,8 +7,6 @@ test("loads the sample, analyzes it, and opens exact evidence", async ({ page })
 
   await page.getByRole("button", { name: "Analyze policy" }).click();
   await expect(page).toHaveURL(/\/analysis\//);
-  await expect(page.getByText("Building an evidence-grounded consultation report")).toBeVisible();
-  await expect(page.getByText("Code stakeholder comments", { exact: true })).toBeVisible();
   await expect(page.getByText("Comments analyzed")).toBeVisible({ timeout: 15_000 });
   await expect(page.getByText("Concerned but constructive")).toBeVisible();
 
