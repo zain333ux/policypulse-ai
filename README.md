@@ -1,90 +1,77 @@
 # PolicyPulse AI
 
-PolicyPulse AI turns proposed policies and stakeholder comments into traceable
-concerns, policy gaps, prioritized recommendations, and a decision-ready report.
+PolicyPulse AI turns proposed policies and stakeholder comments into traceable concerns, policy gaps, prioritized recommendations, and an executive memo.
 
-The production MVP is a focused Next.js + FastAPI application. The original
-Streamlit hackathon application remains at [`app.py`](./app.py) for comparison.
+The production application is a Next.js frontend with a FastAPI backend. The original Streamlit implementation remains in `app.py` as a reference version.
 
-> Public feedback is often collected but not properly understood. PolicyPulse
-> connects every major finding back to the exact policy passage or public
-> comment that supports it.
+> Public feedback is often collected but not properly understood. PolicyPulse AI connects each major finding to the exact policy passage or public comment that supports it.
 
-## Product highlights
+## What this project includes
 
-- PDF, DOCX, TXT, CSV, and pasted-text inputs.
-- Google Forms CSV/XLSX response exports and multi-column open responses.
-- Eight-stage hybrid AI workflow with live progress.
-- Selectable production orchestration: explicit Python baseline or LangGraph.
-- Comment-level coding with deterministic sentiment and frequency calculations.
-- Strict Pydantic schemas and malformed-output retry.
-- Clickable evidence for concerns, gaps, and recommendations.
-- Accessible concern chart with a tabular fallback.
-- Branded PDF and Markdown reports.
-- Cached sample analysis when live AI is unavailable.
-- Policy-only survey generation for consultations that do not have feedback yet.
-- Optional Google Forms creation with linked Sheets, live Drive CSV, and Excel export.
-- Light and dark themes with responsive, keyboard-accessible UI.
-- Temporary job storage, rate limits, request IDs, health checks, and CI.
+- Policy and comment ingestion from PDF, DOCX, TXT, CSV, pasted text, and spreadsheet exports.
+- Structured policy analysis with evidence-linked findings.
+- Comment-level sentiment and concern clustering.
+- Policy gap detection with clear suggested fixes.
+- Prioritized recommendations and an executive memo.
+- Survey blueprint generation for situations where feedback has not yet been collected.
+- Exportable Markdown and PDF reports.
+- Accessible charts, light/dark themes, and responsive layouts.
 
-## Screenshots and live demo
+## Agentic workflow
 
-- Live app: _add the Vercel URL after deployment_
-- API documentation: _add the Render `/docs` URL after deployment_
-- Demo video: _record using [`docs/DEMO_VIDEO_SCRIPT.md`](./docs/DEMO_VIDEO_SCRIPT.md)_
-- Orchestration evaluation: [`docs/ORCHESTRATION_EVALUATION.md`](./docs/ORCHESTRATION_EVALUATION.md)
-- Screenshots: _add final deployment screenshots after URLs are available_
+The production system is intentionally not a framework zoo. It uses a stable baseline with one main advanced orchestration path, plus one isolated comparison experiment.
 
-## Architecture
+| Layer | Role | Status |
+| --- | --- | --- |
+| Explicit Python workflow | Stable production baseline | Active |
+| LangGraph | Main advanced orchestration implementation | Active |
+| CrewAI | Small isolated comparison experiment | Experimental |
 
-```mermaid
-flowchart LR
-    U[Recruiter or policy analyst] --> W[Next.js web app]
-    W -->|parse and analyze| A[FastAPI API]
-    A --> P[Document and comment parsers]
-    A --> J[Temporary job store]
-    J -. optional .-> R[Upstash Redis]
-    A --> G[Groq API]
-    G --> V[Pydantic validation]
-    V --> E[Evidence reference checks]
-    E --> W
-    A --> X[PDF and Markdown exports]
-    A --> F[Google Apps Script connector]
-    F --> GF[Google Form + response Sheet + live CSV]
-```
+The production application does not mix LangGraph, CrewAI, AutoGen, and ADK inside the same runtime path.
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant Web as Next.js
-    participant API as FastAPI
-    participant AI as Groq
+## Technology stack
 
-    User->>Web: Add policy and comments
-    Web->>API: POST /v1/parse
-    Web->>API: POST /v1/analyses
-    API-->>Web: Job ID
-    Web->>API: GET /events
-    par Independent stages
-        API->>AI: Policy extraction
-        API->>AI: Sentiment
-        API->>AI: Concern clustering
-    end
-    API->>AI: Gap detection
-    API->>AI: Recommendations
-    API->>API: Validate schemas and evidence IDs
-    API-->>Web: Completed report
-    User->>Web: Open evidence or export report
-```
+- Python
+- FastAPI
+- Streamlit
+- Next.js
+- React
+- TypeScript
+- Groq API as the default live LLM provider
+- Optional xAI Grok support
+- pandas for CSV handling
+- PyMuPDF for PDF parsing
+- python-docx for DOCX parsing
+- Plotly and Streamlit charts for visualization
+
+## Deployment
+
+Frontend:
+
+- Deployed on Vercel
+- Root directory: `apps/web`
+- API URL is supplied through `NEXT_PUBLIC_API_URL`
+
+Backend:
+
+- Deployed on Render
+- Root directory: `apps/api`
+- Build command: `pip install .`
+- Start command: `uvicorn policypulse_api.main:app --host 0.0.0.0 --port $PORT`
+
+Current blueprint:
+
+- [`render.yaml`](./render.yaml)
 
 ## Repository layout
 
 ```text
 apps/
-  api/    FastAPI service, AI orchestration, schemas, reports, tests
-  web/    Next.js application, design system, results and evidence UI
-app.py    preserved Streamlit hackathon version
-design-system/MASTER.md
+  api/    FastAPI service, orchestration, schemas, reports, tests
+  web/    Next.js application, analysis UI, survey UI, and evidence views
+app.py    preserved Streamlit reference implementation
+docs/     architecture notes, product documentation, and internal planning
+experiments/
 sample_data/
 ```
 
@@ -94,7 +81,9 @@ Requirements:
 
 - Python 3.11+
 - Node.js 22+
-- A Groq or xAI Grok API key for live analysis
+- A Groq API key for live analysis
+
+Clone the repository and create your environment:
 
 ```powershell
 git clone <repository-url>
@@ -102,12 +91,21 @@ cd policypulse-ai
 Copy-Item .env.example .env
 ```
 
-Add your key to `.env`:
+Add the core variables to `.env`:
 
 ```env
 GROQ_API_KEY=your_key_here
-# Or use XAI_API_KEY=your_key_here
 NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
+```
+
+Optional provider settings:
+
+```env
+# Use one provider explicitly when both keys are present
+LLM_PROVIDER=groq
+# Optional xAI Grok support
+XAI_API_KEY=your_xai_key_here
+XAI_MODEL=grok-4.3
 ```
 
 Install and run the API:
@@ -127,8 +125,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). API documentation is at
-[http://localhost:8000/docs](http://localhost:8000/docs).
+Open [http://localhost:3000](http://localhost:3000). API documentation is available at [http://localhost:8000/docs](http://localhost:8000/docs).
 
 Docker is also supported:
 
@@ -140,12 +137,12 @@ docker compose up --build
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `GROQ_API_KEY` | Live AI only | Server-side model access; never sent to the browser |
+| `GROQ_API_KEY` | Live AI only | Server-side model access |
 | `GROQ_MODEL` | No | Defaults to `llama-3.3-70b-versatile` |
-| `XAI_API_KEY` | Live AI only | Optional xAI Grok API key for the same analysis pipeline |
+| `XAI_API_KEY` | Live AI only | Optional xAI Grok API key |
 | `XAI_MODEL` | No | Defaults to `grok-4.3` |
-| `LLM_PROVIDER` | No | Optional explicit provider override: `groq` or `xai` |
-| `ANALYSIS_ORCHESTRATOR` | No | `python` by default; set `langgraph` to run the same production workflow through LangGraph |
+| `LLM_PROVIDER` | No | Explicit provider override: `groq` or `xai` |
+| `ANALYSIS_ORCHESTRATOR` | No | `python` by default; set `langgraph` for the advanced orchestration path |
 | `FRONTEND_ORIGIN` | Production | Allowed web origin for CORS |
 | `NEXT_PUBLIC_API_URL` | Yes | Browser-visible FastAPI base URL |
 | `UPSTASH_REDIS_REST_URL` | No | Optional temporary distributed job storage |
@@ -153,16 +150,11 @@ docker compose up --build
 | `GOOGLE_SCRIPT_URL` | Google Forms only | Deployed Apps Script Web App URL |
 | `GOOGLE_SCRIPT_SECRET` | Google Forms only | Shared connector secret |
 
-Without Upstash, the API uses an in-memory TTL store suitable for a single free
-Render instance and portfolio demonstration.
+Without Upstash, the API uses an in-memory TTL store, which is appropriate for a single free Render instance.
 
 ### Google Forms setup
 
-The connector source and exact deployment instructions are in
-[`integrations/google-apps-script`](./integrations/google-apps-script). It runs
-under the project owner's Google account. Each generated form is linked to a
-Google Sheet, and an installable trigger refreshes a CSV file in Drive after
-every response. The owner also receives direct CSV and Excel export links.
+The connector source and deployment instructions are in [`integrations/google-apps-script`](./integrations/google-apps-script). It runs under the project owner’s Google account. Each generated form is linked to a Google Sheet, and an installable trigger refreshes a CSV file in Drive after every response. The owner also receives direct CSV and Excel export links.
 
 ## Testing
 
@@ -194,65 +186,33 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-GitHub Actions repeats backend, frontend, end-to-end, dependency, and secret
-checks on pushes and pull requests.
-
-## Deployment
-
-### API on Render
-
-Use [`apps/api/render.yaml`](./apps/api/render.yaml), then configure:
-
-- `GROQ_API_KEY`
-- `FRONTEND_ORIGIN` with the final Vercel URL
-- optional Upstash values
-
-### Web on Vercel
-
-Import the repository, select `apps/web` as the root directory, and configure:
-
-```env
-NEXT_PUBLIC_API_URL=https://your-render-service.onrender.com
-```
-
-Free-tier behavior and limits can change; verify current provider terms before
-deployment.
+GitHub Actions runs backend, frontend, end-to-end, dependency, and secret checks on pushes and pull requests.
 
 ## Privacy and responsible AI
 
-- Uploaded content is processed for the current analysis and is not permanently
-  stored by the application.
+- Uploaded content is processed for the current analysis and is not permanently stored by the application.
 - Temporary jobs expire automatically.
 - Content is sent to the configured AI provider.
-- Every generated finding must reference valid indexed evidence or be labeled
-  as limited evidence.
+- Every generated finding must reference valid indexed evidence or be labeled as limited evidence.
 - Outputs are AI-generated, require human review, and are not legal advice.
-- Do not upload confidential or personally identifying data to the public demo.
+- Do not upload confidential or personally identifying data.
 
 ## Engineering trade-offs
 
-This MVP intentionally avoids authentication, billing, permanent databases,
-microservices, Kubernetes, and heavy agent frameworks. Those additions would
-increase operational surface without improving the core portfolio story:
+This MVP intentionally avoids authentication, billing, permanent databases, microservices, Kubernetes, and heavy agent frameworks. Those additions would increase operational surface without improving the core value proposition:
 
-**clean UX + real AI workflow + traceable evidence + report export + reliable
-engineering.**
+clean UX + real AI workflow + traceable evidence + report export + reliable engineering.
 
-The stable baseline still uses explicit Python services and typed schemas so its
-behavior is easy to inspect, test, and explain in an interview. LangGraph is
-available as the main advanced orchestration option, while any other framework
-comparison stays isolated under [`experiments/`](./experiments).
+The stable baseline uses explicit Python services and typed schemas so behavior is easy to inspect, test, and explain. LangGraph is available as the main advanced orchestration option, while the CrewAI comparison stays isolated under [`experiments/`](./experiments).
 
-For model providers, the production pipeline supports both Groq and xAI Grok.
-If both keys are present, set `LLM_PROVIDER` explicitly so demos stay predictable.
+For model providers, the production pipeline supports both Groq and xAI Grok. If both keys are present, set `LLM_PROVIDER` explicitly so behavior stays predictable.
 
-## Legacy hackathon app
+## Legacy Streamlit reference
 
-The original Streamlit version remains runnable:
+The original Streamlit application is still available:
 
 ```powershell
 .\.venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-It is preserved to show the project’s evolution from hackathon prototype to
-production-oriented portfolio MVP.
+It is preserved as a reference implementation for the earlier hackathon phase.
