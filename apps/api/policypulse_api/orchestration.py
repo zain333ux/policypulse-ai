@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from collections.abc import Awaitable, Callable
 from typing import Literal, TypedDict, cast
 
@@ -10,9 +11,11 @@ from .config import Settings
 from .llm import LlmService
 from .prompts import (
     COMMENT_CODING_PROMPT,
+    CONCERN_REDUCTION_PROMPT,
     CONCERN_SYNTHESIS_PROMPT,
     GAP_DETECTION_PROMPT,
     POLICY_EXTRACTION_PROMPT,
+    POLICY_REDUCTION_PROMPT,
     RECOMMENDATION_PROMPT,
 )
 from .schemas import (
@@ -31,6 +34,21 @@ from .sources import create_comment_sources, split_policy_paragraphs
 
 ProgressCallback = Callable[[str, StageStatus, str], Awaitable[None]]
 OrchestratorName = Literal["python", "langgraph"]
+
+MAX_POLICY_STAGE_CHARS = 10_000
+MAX_POLICY_SOURCE_TEXT_CHARS = 900
+MAX_POLICY_MAP_CHUNK_CHARS = 6_500
+MAX_POLICY_REDUCTION_CHARS = 9_000
+MAX_COMMENT_CODING_BATCH_CHARS = 7_000
+MAX_COMMENT_CODING_BATCH_ITEMS = 20
+MAX_CONCERN_STAGE_CHARS = 10_000
+MAX_CONCERN_COMMENT_TEXT_CHARS = 280
+MAX_CONCERN_MAP_CHUNK_CHARS = 6_500
+MAX_CONCERN_MAP_CHUNK_ITEMS = 24
+MAX_CONCERN_REDUCTION_CHARS = 9_000
+MAX_GAP_STAGE_CHARS = 10_000
+MAX_GAP_POLICY_SOURCE_TEXT_CHARS = 600
+MAX_GAP_COMMENT_SOURCE_TEXT_CHARS = 220
 
 
 class CommentCodingPayload(BaseModel):
@@ -65,6 +83,7 @@ class WorkflowState(TypedDict, total=False):
     progress: ProgressCallback
     llm: LlmService
     orchestrator: OrchestratorName
+    ingestion_warnings: list[str]
     policy_sources: list[SourceItem]
     comment_sources: list[SourceItem]
     sources: list[SourceItem]
@@ -172,6 +191,7 @@ async def _prepare_state(
         progress=progress,
         llm=llm or LlmService(settings),
         orchestrator=orchestrator,
+        ingestion_warnings=[*request.ingestion_warnings],
         policy_sources=policy_sources,
         comment_sources=comment_sources,
         sources=sources,
@@ -184,11 +204,7 @@ async def _prepare_state(
 async def _run_policy_stage(state: WorkflowState) -> WorkflowState:
     progress = state["progress"]
     await progress("policy", StageStatus.RUNNING, "Extracting rules and affected groups")
-    policy = await state["llm"].structured(
-        system_prompt=POLICY_EXTRACTION_PROMPT,
-        user_payload={"policy_paragraphs": state["policy_data"]},
-        response_model=PolicyAnalysis,
-    )
+    policy = await _extract_policy_analysis(state)
     _validate_evidence(policy.evidence_ids, state["source_ids"])
     await progress("policy", StageStatus.COMPLETED, "Policy structure extracted")
     return {"policy": policy}
@@ -213,14 +229,7 @@ async def _run_sentiment_stage(state: WorkflowState) -> WorkflowState:
 async def _run_concerns_stage(state: WorkflowState) -> WorkflowState:
     progress = state["progress"]
     await progress("concerns", StageStatus.RUNNING, "Synthesizing non-overlapping concern themes")
-    concerns_payload = await state["llm"].structured(
-        system_prompt=CONCERN_SYNTHESIS_PROMPT,
-        user_payload={
-            "comments": state["comment_data"],
-            "comment_assessments": [item.model_dump(mode="json") for item in state["assessments"]],
-        },
-        response_model=ConcernsPayload,
-    )
+    concerns_payload = await _synthesize_concerns(state)
     concerns = _finalize_concerns(
         concerns_payload.concerns,
         state["source_ids"],
@@ -235,11 +244,7 @@ async def _run_gaps_stage(state: WorkflowState) -> WorkflowState:
     await progress("gaps", StageStatus.RUNNING, "Comparing policy coverage with public concerns")
     gaps_payload = await state["llm"].structured(
         system_prompt=GAP_DETECTION_PROMPT,
-        user_payload={
-            "policy": state["policy"].model_dump(mode="json"),
-            "concerns": [concern.model_dump(mode="json") for concern in state["concerns"]],
-            "sources": [source.model_dump(mode="json") for source in state["sources"]],
-        },
+        user_payload=_build_gap_payload(state),
         response_model=GapsPayload,
     )
     concern_ids = {concern.id for concern in state["concerns"]}
@@ -308,7 +313,7 @@ def _build_result(state: WorkflowState) -> AnalysisResult:
             "Frequency reflects the uploaded comments and is not representative polling.",
             "This report is not legal advice.",
         ],
-        ingestion_warnings=state["request"].ingestion_warnings,
+        ingestion_warnings=state["ingestion_warnings"],
         sources=state["sources"],
     )
 
@@ -326,7 +331,7 @@ def _validate_references(ids: list[str], allowed: set[str], kind: str) -> None:
 
 
 async def _code_comments(llm: LlmService, comments: list[dict[str, object]]) -> list[CommentAssessment]:
-    batches = [comments[index : index + 40] for index in range(0, len(comments), 40)]
+    batches = _batch_comment_payloads(comments)
     payloads = await asyncio.gather(
         *[
             llm.structured(
@@ -343,6 +348,299 @@ async def _code_comments(llm: LlmService, comments: list[dict[str, object]]) -> 
     if set(actual) != expected or len(actual) != len(expected):
         raise ValueError("Comment coding must return every supplied comment exactly once.")
     return assessments
+
+
+async def _extract_policy_analysis(state: WorkflowState) -> PolicyAnalysis:
+    compact_sources = [
+        _compact_source(source, max_text_chars=MAX_POLICY_SOURCE_TEXT_CHARS)
+        for source in state["policy_sources"]
+    ]
+    payload = {"policy_paragraphs": compact_sources}
+    if _json_size(payload) <= MAX_POLICY_STAGE_CHARS:
+        return await state["llm"].structured(
+            system_prompt=POLICY_EXTRACTION_PROMPT,
+            user_payload=payload,
+            response_model=PolicyAnalysis,
+        )
+
+    chunks = _chunk_records_by_chars(compact_sources, MAX_POLICY_MAP_CHUNK_CHARS)
+    partials = await asyncio.gather(
+        *[
+            state["llm"].structured(
+                system_prompt=POLICY_EXTRACTION_PROMPT,
+                user_payload={"policy_paragraphs": chunk},
+                response_model=PolicyAnalysis,
+            )
+            for chunk in chunks
+        ]
+    )
+    for partial in partials:
+        _validate_evidence(partial.evidence_ids, state["source_ids"])
+    _append_warning(
+        state,
+        "Large policy text was analyzed in multiple passes to stay within live model limits.",
+    )
+    return await _merge_policy_analyses(state["llm"], partials)
+
+
+async def _merge_policy_analyses(llm: LlmService, partials: list[PolicyAnalysis]) -> PolicyAnalysis:
+    current = [partial.model_dump(mode="json") for partial in partials]
+    while len(current) > 1 and _json_size({"partial_analyses": current}) > MAX_POLICY_REDUCTION_CHARS:
+        batches = _chunk_records_by_chars(current, MAX_POLICY_REDUCTION_CHARS)
+        reduced = await asyncio.gather(
+            *[
+                llm.structured(
+                    system_prompt=POLICY_REDUCTION_PROMPT,
+                    user_payload={"partial_analyses": batch},
+                    response_model=PolicyAnalysis,
+                )
+                for batch in batches
+            ]
+        )
+        current = [item.model_dump(mode="json") for item in reduced]
+    return await llm.structured(
+        system_prompt=POLICY_REDUCTION_PROMPT,
+        user_payload={"partial_analyses": current},
+        response_model=PolicyAnalysis,
+    )
+
+
+async def _synthesize_concerns(state: WorkflowState) -> ConcernsPayload:
+    dossiers = _build_comment_dossiers(state)
+    payload = {
+        "total_comments": len(state["comment_sources"]),
+        "comment_dossiers": dossiers,
+        "comment_assessments": [item.model_dump(mode="json") for item in state["assessments"]],
+    }
+    if _json_size(payload) <= MAX_CONCERN_STAGE_CHARS:
+        return await state["llm"].structured(
+            system_prompt=CONCERN_SYNTHESIS_PROMPT,
+            user_payload=payload,
+            response_model=ConcernsPayload,
+        )
+
+    batches = _chunk_records_by_chars(
+        dossiers,
+        MAX_CONCERN_MAP_CHUNK_CHARS,
+        max_items=MAX_CONCERN_MAP_CHUNK_ITEMS,
+    )
+    partial_payloads = await asyncio.gather(
+        *[
+            state["llm"].structured(
+                system_prompt=CONCERN_SYNTHESIS_PROMPT,
+                user_payload={
+                    "total_comments": len(state["comment_sources"]),
+                    "comment_dossiers": batch,
+                    "comment_assessments": _assessments_for_comment_batch(state["assessments"], batch),
+                },
+                response_model=ConcernsPayload,
+            )
+            for batch in batches
+        ]
+    )
+    _append_warning(
+        state,
+        "Large comment evidence was analyzed in multiple passes to stay within live model limits.",
+    )
+    return await _merge_concern_payloads(state["llm"], partial_payloads, len(state["comment_sources"]))
+
+
+async def _merge_concern_payloads(
+    llm: LlmService,
+    partial_payloads: list[ConcernsPayload],
+    total_comments: int,
+) -> ConcernsPayload:
+    current = [
+        concern.model_dump(mode="json")
+        for payload in partial_payloads
+        for concern in payload.concerns
+    ]
+    while len(current) > 1 and _json_size({"partial_concerns": current}) > MAX_CONCERN_REDUCTION_CHARS:
+        batches = _chunk_records_by_chars(current, MAX_CONCERN_REDUCTION_CHARS)
+        reduced = await asyncio.gather(
+            *[
+                llm.structured(
+                    system_prompt=CONCERN_REDUCTION_PROMPT,
+                    user_payload={"total_comments": total_comments, "partial_concerns": batch},
+                    response_model=ConcernsPayload,
+                )
+                for batch in batches
+            ]
+        )
+        current = [concern.model_dump(mode="json") for payload in reduced for concern in payload.concerns]
+    return await llm.structured(
+        system_prompt=CONCERN_REDUCTION_PROMPT,
+        user_payload={"total_comments": total_comments, "partial_concerns": current},
+        response_model=ConcernsPayload,
+    )
+
+
+def _build_gap_payload(state: WorkflowState) -> dict[str, object]:
+    concern_evidence_ids = {evidence_id for concern in state["concerns"] for evidence_id in concern.evidence_ids}
+    policy_sources = [
+        _compact_source(source, max_text_chars=MAX_GAP_POLICY_SOURCE_TEXT_CHARS)
+        for source in state["policy_sources"]
+    ]
+    comment_sources = [
+        _compact_source(source, max_text_chars=MAX_GAP_COMMENT_SOURCE_TEXT_CHARS)
+        for source in state["comment_sources"]
+        if source.id in concern_evidence_ids
+    ]
+    selected_policy = _limit_records_by_chars(policy_sources, MAX_GAP_STAGE_CHARS // 2)
+    remaining_budget = max(1_000, MAX_GAP_STAGE_CHARS - _json_size(selected_policy))
+    selected_comments = _limit_records_by_chars(comment_sources, remaining_budget)
+    if _payload_was_condensed(policy_sources, selected_policy) or _payload_was_condensed(
+        comment_sources, selected_comments
+    ):
+        _append_warning(
+            state,
+            "Gap detection used compact evidence excerpts to stay within live model limits.",
+        )
+    return {
+        "policy": state["policy"].model_dump(mode="json"),
+        "concerns": [concern.model_dump(mode="json") for concern in state["concerns"]],
+        "sources": [*selected_policy, *selected_comments],
+    }
+
+
+def _build_comment_dossiers(state: WorkflowState) -> list[dict[str, object]]:
+    assessments_by_id = {assessment.comment_id: assessment for assessment in state["assessments"]}
+    dossiers: list[dict[str, object]] = []
+    for source in state["comment_sources"]:
+        assessment = assessments_by_id.get(source.id)
+        if not assessment:
+            continue
+        dossiers.append(
+            {
+                "id": source.id,
+                "text": _truncate_text(source.text, MAX_CONCERN_COMMENT_TEXT_CHARS),
+                "stance": assessment.stance,
+                "urgency": assessment.urgency,
+                "tone": assessment.tone,
+                "themes": assessment.themes,
+                "affected_groups": assessment.affected_groups,
+            }
+        )
+    return dossiers
+
+
+def _assessments_for_comment_batch(
+    assessments: list[CommentAssessment],
+    batch: list[dict[str, object]],
+) -> list[dict[str, object]]:
+    batch_ids = {str(item["id"]) for item in batch}
+    return [
+        assessment.model_dump(mode="json")
+        for assessment in assessments
+        if assessment.comment_id in batch_ids
+    ]
+
+
+def _batch_comment_payloads(comments: list[dict[str, object]]) -> list[list[dict[str, object]]]:
+    batches: list[list[dict[str, object]]] = []
+    current: list[dict[str, object]] = []
+    current_size = 0
+    for comment in comments:
+        comment_size = _json_size(comment)
+        next_size = current_size + comment_size
+        if current and (
+            len(current) >= MAX_COMMENT_CODING_BATCH_ITEMS or next_size > MAX_COMMENT_CODING_BATCH_CHARS
+        ):
+            batches.append(current)
+            current = []
+            current_size = 0
+        current.append(comment)
+        current_size += comment_size
+    if current:
+        batches.append(current)
+    return batches
+
+
+def _compact_source(source: SourceItem, *, max_text_chars: int) -> dict[str, object]:
+    return {
+        "id": source.id,
+        "type": source.type.value,
+        "text": _truncate_text(source.text, max_text_chars),
+    }
+
+
+def _limit_records_by_chars(records: list[dict[str, object]], max_chars: int) -> list[dict[str, object]]:
+    if not records:
+        return []
+    selected: list[dict[str, object]] = []
+    current_size = 0
+    for record in records:
+        record_size = _json_size(record)
+        if selected and current_size + record_size > max_chars:
+            break
+        selected.append(record)
+        current_size += record_size
+    return selected or [records[0]]
+
+
+def _chunk_records_by_chars(
+    records: list[dict[str, object]],
+    max_chars: int,
+    *,
+    max_items: int | None = None,
+) -> list[list[dict[str, object]]]:
+    if not records:
+        return []
+    batches: list[list[dict[str, object]]] = []
+    current: list[dict[str, object]] = []
+    current_size = 0
+    for record in records:
+        record_size = _json_size(record)
+        should_split = bool(
+            current
+            and (
+                current_size + record_size > max_chars
+                or (max_items is not None and len(current) >= max_items)
+            )
+        )
+        if should_split:
+            batches.append(current)
+            current = []
+            current_size = 0
+        current.append(record)
+        current_size += record_size
+    if current:
+        batches.append(current)
+    return batches
+
+
+def _payload_was_condensed(
+    original_records: list[dict[str, object]],
+    selected_records: list[dict[str, object]],
+) -> bool:
+    if len(selected_records) < len(original_records):
+        return True
+    selected_by_id = {str(record["id"]): record for record in selected_records}
+    for record in original_records:
+        selected = selected_by_id.get(str(record["id"]))
+        if not selected:
+            return True
+        if selected != record:
+            return True
+    return False
+
+
+def _append_warning(state: WorkflowState, message: str) -> None:
+    warnings = state.setdefault("ingestion_warnings", [])
+    if message not in warnings and len(warnings) < 20:
+        warnings.append(message)
+
+
+def _truncate_text(text: str, max_chars: int) -> str:
+    if len(text) <= max_chars:
+        return text
+    if max_chars <= 1:
+        return text[:max_chars]
+    return f"{text[: max_chars - 1].rstrip()}…"
+
+
+def _json_size(value: object) -> int:
+    return len(json.dumps(value, ensure_ascii=False))
 
 
 def _calculate_sentiment(assessments: list[CommentAssessment]) -> Sentiment:

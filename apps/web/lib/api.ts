@@ -10,6 +10,14 @@ import type {
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 
+function extractErrorMessage(payload: unknown, fallback: string): string {
+  if (payload && typeof payload === "object" && "detail" in payload) {
+    const detail = (payload as { detail?: unknown }).detail;
+    if (typeof detail === "string" && detail.trim()) return detail;
+  }
+  return fallback;
+}
+
 async function requestJson<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
   const response = await fetch(input, {
     ...init,
@@ -19,8 +27,8 @@ async function requestJson<T>(input: RequestInfo | URL, init?: RequestInit): Pro
     cache: "no-store",
   });
   if (!response.ok) {
-    const payload = (await response.json().catch(() => null)) as { detail?: string } | null;
-    throw new Error(payload?.detail ?? `Request failed with status ${response.status}`);
+    const payload = await response.json().catch(() => null);
+    throw new Error(extractErrorMessage(payload, `Request failed with status ${response.status}`));
   }
   return (await response.json()) as T;
 }
@@ -32,8 +40,8 @@ export async function parseInputs(form: FormData): Promise<ParseResponse> {
     cache: "no-store",
   });
   if (!response.ok) {
-    const payload = (await response.json().catch(() => null)) as { detail?: string } | null;
-    throw new Error(payload?.detail ?? `Parse failed with status ${response.status}`);
+    const payload = await response.json().catch(() => null);
+    throw new Error(extractErrorMessage(payload, `Parse failed with status ${response.status}`));
   }
   return (await response.json()) as ParseResponse;
 }
@@ -57,8 +65,8 @@ export async function exportReport(result: AnalysisResult, format: "markdown" | 
     body: JSON.stringify({ result, format }),
   });
   if (!response.ok) {
-    const payload = (await response.json().catch(() => null)) as { detail?: string } | null;
-    throw new Error(payload?.detail ?? `Export failed with status ${response.status}`);
+    const payload = await response.json().catch(() => null);
+    throw new Error(extractErrorMessage(payload, `Export failed with status ${response.status}`));
   }
   return await response.blob();
 }
@@ -70,8 +78,8 @@ export async function parsePolicy(form: FormData): Promise<ParseResponse> {
     cache: "no-store",
   });
   if (!response.ok) {
-    const payload = (await response.json().catch(() => null)) as { detail?: string } | null;
-    throw new Error(payload?.detail ?? `Parse failed with status ${response.status}`);
+    const payload = await response.json().catch(() => null);
+    throw new Error(extractErrorMessage(payload, `Parse failed with status ${response.status}`));
   }
   return (await response.json()) as ParseResponse;
 }
@@ -99,8 +107,32 @@ export async function exportSurveyTemplate(blueprint: SurveyBlueprint): Promise<
     body: JSON.stringify({ blueprint }),
   });
   if (!response.ok) {
-    const payload = (await response.json().catch(() => null)) as { detail?: string } | null;
-    throw new Error(payload?.detail ?? `Export failed with status ${response.status}`);
+    const payload = await response.json().catch(() => null);
+    throw new Error(extractErrorMessage(payload, `Export failed with status ${response.status}`));
   }
   return await response.blob();
+}
+
+export function presentApiError(error: unknown): string {
+  const message = error instanceof Error ? error.message : "The request could not be completed.";
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes("failed to fetch")) {
+    return "🌐 We could not reach the live analysis service just now. Please confirm the deployed API is available and try again.";
+  }
+  if (
+    normalized.includes("rate limit") ||
+    normalized.includes("too many requests") ||
+    normalized.includes("request too large") ||
+    normalized.includes("tokens per minute") ||
+    normalized.includes("permission-denied") ||
+    normalized.includes("credits") ||
+    normalized.includes("service tier")
+  ) {
+    return "🤖 Our live AI helper needs a short coffee break — this showcase deployment has temporarily hit provider usage or quota limits. Please try again shortly, reduce the submission size, or use the verified sample.";
+  }
+  if (normalized.includes("timed out") || normalized.includes("timeout")) {
+    return "⏳ The live analysis took a little too long this time. Please try again in a moment or submit a smaller document set.";
+  }
+  return message;
 }

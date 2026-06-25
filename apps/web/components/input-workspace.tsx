@@ -14,7 +14,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useMemo, useState } from "react";
-import { createAnalysis, parseInputs } from "@/lib/api";
+import { createAnalysis, parseInputs, presentApiError } from "@/lib/api";
 
 const DEMO_POLICY = `University Attendance and Academic Participation Policy
 
@@ -80,7 +80,7 @@ export function InputWorkspace() {
       });
       router.push(`/analysis/${created.id}`);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "The analysis could not be started.");
+      setError(presentApiError(caught));
     } finally {
       setLoading(false);
     }
@@ -179,7 +179,7 @@ export function InputWorkspace() {
           className="mt-6 rounded-2xl border px-4 py-3"
           style={{ borderColor: "var(--danger)", background: "var(--danger-soft)", color: "var(--danger)" }}
         >
-          <strong>Check your inputs.</strong> {error}
+          <strong>Analysis could not start.</strong> {error}
         </div>
       )}
 

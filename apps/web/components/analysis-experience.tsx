@@ -17,7 +17,7 @@ import {
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ConcernChart } from "@/components/concern-chart";
-import { API_URL, exportReport, getAnalysis } from "@/lib/api";
+import { API_URL, exportReport, getAnalysis, presentApiError } from "@/lib/api";
 import type {
   AnalysisJob,
   AnalysisResult,
@@ -45,10 +45,10 @@ export function AnalysisExperience({ analysisId }: { analysisId: string }) {
     try {
       const next = await getAnalysis(analysisId);
       setJob(next);
-      setError(next.error ?? "");
+      setError(next.error ? presentApiError(new Error(next.error)) : "");
       return next;
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "The analysis could not be loaded.");
+      setError(presentApiError(caught));
       return null;
     }
   }, [analysisId]);
@@ -225,6 +225,9 @@ function AnalysisError({ message, onRetry }: { message: string; onRetry: () => v
         <p className="mt-3" style={{ color: "var(--muted-foreground)" }}>
           {message}
         </p>
+        <p className="mt-2 text-sm" style={{ color: "var(--faint-foreground)" }}>
+          This public deployment is intended for showcasing the product experience, so temporary provider limits can occasionally interrupt a live run. We are sorry when that happens — the AI agents are talented, but still not fully immune to demo-day drama 🙂
+        </p>
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
           <button
             type="button"
@@ -392,14 +395,14 @@ function Overview({
   openEvidence: (id: string, finding: string) => void;
 }) {
   const critical = result.gaps.filter((gap) => gap.severity === "critical").length;
-  const ingestionWarnings = result.ingestion_warnings ?? [];
+  const ingestionWarnings = formatProcessingNotes(result.ingestion_warnings ?? []);
   return (
     <div className="space-y-6">
       {ingestionWarnings.length > 0 && (
         <section className="rounded-2xl border bg-[var(--warning-soft)] p-5">
           <div className="flex items-center gap-2 text-[var(--warning)]">
             <AlertTriangle aria-hidden="true" size={19} />
-            <h2 className="font-semibold">Document ingestion warnings</h2>
+            <h2 className="font-semibold">Processing notes</h2>
           </div>
           <ul className="mt-3 space-y-1 text-sm text-[var(--warning)]">
             {ingestionWarnings.map((warning) => (
@@ -629,8 +632,36 @@ function Memo({ result }: { result: AnalysisResult }) {
           ))}
         </ul>
       </section>
+      <section className="rounded-2xl border bg-[var(--surface-subtle)] p-5">
+        <h2 className="font-semibold">Showcase deployment note</h2>
+        <p className="mt-2 text-sm leading-6" style={{ color: "var(--muted-foreground)" }}>
+          This public deployment is provided to demonstrate the PolicyPulse AI workflow and reporting experience.
+          Because the app depends on live third-party AI providers, analyses may occasionally be delayed, rate-limited,
+          or temporarily unavailable during periods of higher usage. If that happens, please retry shortly or use the
+          verified sample scenario included in the workspace.
+        </p>
+      </section>
     </div>
   );
+}
+
+function formatProcessingNotes(warnings: string[]): string[] {
+  return warnings.map((warning) => {
+    const normalized = warning.toLowerCase();
+    if (normalized.includes("policy text was analyzed in multiple passes")) {
+      return "Large submission analyzed in multiple passes so the full policy could be reviewed within live model limits.";
+    }
+    if (normalized.includes("comment evidence was analyzed in multiple passes")) {
+      return "Large comment set analyzed in multiple passes so broader stakeholder feedback could still be included.";
+    }
+    if (normalized.includes("gap detection used compact evidence excerpts")) {
+      return "Some evidence excerpts were shortened during gap detection to keep the live analysis stable.";
+    }
+    if (normalized.includes("condensed")) {
+      return "Parts of the uploaded material were condensed to fit the live analysis window while preserving the main evidence trail.";
+    }
+    return warning;
+  });
 }
 
 function EvidencePanel({
