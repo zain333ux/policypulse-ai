@@ -1,6 +1,7 @@
 import os
 from groq import Groq
 from dotenv import load_dotenv
+from src.utils.settings import get_secret
 
 load_dotenv()
 
@@ -8,9 +9,9 @@ def call_llm(system_prompt: str, user_prompt: str) -> str:
     """Calls Groq API. Single entry point for all agents.
     Uses llama-3.3-70b-versatile for fast, cost-effective hackathon inference.
     """
-    api_key = os.getenv("GROQ_API_KEY")
+    api_key = get_secret("GROQ_API_KEY")
     if not api_key:
-        raise ValueError("GROQ_API_KEY environment variable is missing. Add it to your .env file.")
+        raise ValueError("GROQ_API_KEY is missing. Add it to your local .env file or Streamlit app secrets.")
 
     client = Groq(api_key=api_key)
 

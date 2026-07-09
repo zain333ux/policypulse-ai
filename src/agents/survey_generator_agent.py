@@ -1,8 +1,8 @@
 import json
-import os
 import requests
 from src.utils.llm_client import call_llm
 from src.utils.json_utils import parse_json_from_llm
+from src.utils.settings import get_secret
 
 def generate_survey(policy_text: str, llm_call=None) -> dict:
     """Generates a structured civic feedback survey based on the policy text.
@@ -68,8 +68,8 @@ Strictly follow these rules:
     except Exception:
         return fallback_data
 
-GOOGLE_SCRIPT_URL = os.getenv("GOOGLE_SCRIPT_URL", "")
-GOOGLE_SCRIPT_SECRET = os.getenv("GOOGLE_SCRIPT_SECRET", "")
+GOOGLE_SCRIPT_URL = get_secret("GOOGLE_SCRIPT_URL", "")
+GOOGLE_SCRIPT_SECRET = get_secret("GOOGLE_SCRIPT_SECRET", "")
 
 def deploy_google_form(survey_json):
     if not GOOGLE_SCRIPT_URL:

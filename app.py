@@ -89,6 +89,7 @@ st.set_page_config(
 # Load background image dynamically
 import base64
 import os
+from src.utils.settings import get_secret
 
 bg_base64 = ""
 bg_ext = "png"
@@ -1448,9 +1449,9 @@ with st.sidebar:
     )
 
     # API Key Check
-    api_key_configured = bool(os.getenv("GROQ_API_KEY"))
+    api_key_configured = bool(get_secret("GROQ_API_KEY"))
     if not api_key_configured:
-        st.error("⚠️ **Groq API Key Missing**\n\nAdd `GROQ_API_KEY` to your `.env` file.")
+        st.error("⚠️ **Groq API Key Missing**\n\nAdd `GROQ_API_KEY` to your local `.env` file or Streamlit app secrets.")
 
     # Agent Pipeline Status
     st.markdown('<div style="font-size:9px; text-transform:uppercase; letter-spacing:0.08em; color:#3D5070; font-family:\'JetBrains Mono\', monospace; font-weight:600; margin-bottom:6px;">Agent Pipeline</div>', unsafe_allow_html=True)
