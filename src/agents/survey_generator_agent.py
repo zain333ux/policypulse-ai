@@ -1,7 +1,9 @@
 import json
+
 import requests
-from src.utils.llm_client import call_llm
+
 from src.utils.json_utils import parse_json_from_llm
+from src.utils.llm_client import call_llm
 from src.utils.settings import get_secret
 
 def generate_survey(policy_text: str, llm_call=None) -> dict:
@@ -68,25 +70,25 @@ Strictly follow these rules:
     except Exception:
         return fallback_data
 
-GOOGLE_SCRIPT_URL = get_secret("GOOGLE_SCRIPT_URL", "")
-GOOGLE_SCRIPT_SECRET = get_secret("GOOGLE_SCRIPT_SECRET", "")
-
 def deploy_google_form(survey_json):
-    if not GOOGLE_SCRIPT_URL:
+    google_script_url = get_secret("GOOGLE_SCRIPT_URL", "")
+    google_script_secret = get_secret("GOOGLE_SCRIPT_SECRET", "")
+
+    if not google_script_url:
         return {
-            "error": "Google Forms deployment is disabled. Configure GOOGLE_SCRIPT_URL and GOOGLE_SCRIPT_SECRET to enable it.",
+            "error": "Google Forms deployment is not configured yet. Add GOOGLE_SCRIPT_URL and GOOGLE_SCRIPT_SECRET in Streamlit secrets to enable it.",
             "url": None,
             "edit_url": None
         }
     try:
         payload = {
             "action": "create_form",
-            "secret": GOOGLE_SCRIPT_SECRET,
+            "secret": google_script_secret,
             "blueprint": survey_json
         }
 
         response = requests.post(
-            GOOGLE_SCRIPT_URL,
+            google_script_url,
             json=payload,
             timeout=30
         )
@@ -105,10 +107,28 @@ def deploy_google_form(survey_json):
             }
         else:
             return {
-                "error": data.get("error", "Google Apps Script error"),
+                "error": data.get("error", "Google Apps Script could not create the form."),
                 "url": None,
                 "edit_url": None
             }
+    except requests.exceptions.Timeout:
+        return {
+            "error": "Google Forms took too long to respond. Please try again in a moment.",
+            "url": None,
+            "edit_url": None
+        }
+    except requests.exceptions.RequestException as e:
+        return {
+            "error": f"Google Forms could not be reached right now: {e}",
+            "url": None,
+            "edit_url": None
+        }
+    except ValueError:
+        return {
+            "error": "Google Forms returned a response we could not read. Please verify the Apps Script deployment and try again.",
+            "url": None,
+            "edit_url": None
+        }
     except Exception as e:
         return {
             "error": str(e),
@@ -117,19 +137,22 @@ def deploy_google_form(survey_json):
         }
 
 def fetch_form_responses(form_id: str) -> dict:
-    if not GOOGLE_SCRIPT_URL:
+    google_script_url = get_secret("GOOGLE_SCRIPT_URL", "")
+    google_script_secret = get_secret("GOOGLE_SCRIPT_SECRET", "")
+
+    if not google_script_url:
         return {
-            "error": "Google Forms deployment is disabled. Configure GOOGLE_SCRIPT_URL to enable fetching.",
+            "error": "Google Forms fetching is not configured yet. Add GOOGLE_SCRIPT_URL in Streamlit secrets to enable it.",
             "csv": None
         }
     try:
         payload = {
             "action": "get_responses",
-            "secret": GOOGLE_SCRIPT_SECRET,
+            "secret": google_script_secret,
             "form_id": form_id
         }
         response = requests.post(
-            GOOGLE_SCRIPT_URL,
+            google_script_url,
             json=payload,
             timeout=30
         )
@@ -145,6 +168,21 @@ def fetch_form_responses(form_id: str) -> dict:
                 "error": data.get("error", "Failed to fetch responses from Google Forms."),
                 "csv": None
             }
+    except requests.exceptions.Timeout:
+        return {
+            "error": "Google Forms did not respond in time. Please retry in a few moments.",
+            "csv": None
+        }
+    except requests.exceptions.RequestException as e:
+        return {
+            "error": f"We could not reach the Google Forms bridge right now: {e}",
+            "csv": None
+        }
+    except ValueError:
+        return {
+            "error": "Google Forms returned data in an unexpected format. Please verify the Apps Script deployment and try again.",
+            "csv": None
+        }
     except Exception as e:
         return {
             "error": str(e),
