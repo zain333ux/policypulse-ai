@@ -352,8 +352,7 @@ async def _code_comments(llm: LlmService, comments: list[dict[str, object]]) -> 
 
 async def _extract_policy_analysis(state: WorkflowState) -> PolicyAnalysis:
     compact_sources = [
-        _compact_source(source, max_text_chars=MAX_POLICY_SOURCE_TEXT_CHARS)
-        for source in state["policy_sources"]
+        _compact_source(source, max_text_chars=MAX_POLICY_SOURCE_TEXT_CHARS) for source in state["policy_sources"]
     ]
     payload = {"policy_paragraphs": compact_sources}
     if _json_size(payload) <= MAX_POLICY_STAGE_CHARS:
@@ -450,11 +449,7 @@ async def _merge_concern_payloads(
     partial_payloads: list[ConcernsPayload],
     total_comments: int,
 ) -> ConcernsPayload:
-    current = [
-        concern.model_dump(mode="json")
-        for payload in partial_payloads
-        for concern in payload.concerns
-    ]
+    current = [concern.model_dump(mode="json") for payload in partial_payloads for concern in payload.concerns]
     while len(current) > 1 and _json_size({"partial_concerns": current}) > MAX_CONCERN_REDUCTION_CHARS:
         batches = _chunk_records_by_chars(current, MAX_CONCERN_REDUCTION_CHARS)
         reduced = await asyncio.gather(
@@ -478,8 +473,7 @@ async def _merge_concern_payloads(
 def _build_gap_payload(state: WorkflowState) -> dict[str, object]:
     concern_evidence_ids = {evidence_id for concern in state["concerns"] for evidence_id in concern.evidence_ids}
     policy_sources = [
-        _compact_source(source, max_text_chars=MAX_GAP_POLICY_SOURCE_TEXT_CHARS)
-        for source in state["policy_sources"]
+        _compact_source(source, max_text_chars=MAX_GAP_POLICY_SOURCE_TEXT_CHARS) for source in state["policy_sources"]
     ]
     comment_sources = [
         _compact_source(source, max_text_chars=MAX_GAP_COMMENT_SOURCE_TEXT_CHARS)
@@ -529,11 +523,7 @@ def _assessments_for_comment_batch(
     batch: list[dict[str, object]],
 ) -> list[dict[str, object]]:
     batch_ids = {str(item["id"]) for item in batch}
-    return [
-        assessment.model_dump(mode="json")
-        for assessment in assessments
-        if assessment.comment_id in batch_ids
-    ]
+    return [assessment.model_dump(mode="json") for assessment in assessments if assessment.comment_id in batch_ids]
 
 
 def _batch_comment_payloads(comments: list[dict[str, object]]) -> list[list[dict[str, object]]]:
@@ -543,9 +533,7 @@ def _batch_comment_payloads(comments: list[dict[str, object]]) -> list[list[dict
     for comment in comments:
         comment_size = _json_size(comment)
         next_size = current_size + comment_size
-        if current and (
-            len(current) >= MAX_COMMENT_CODING_BATCH_ITEMS or next_size > MAX_COMMENT_CODING_BATCH_CHARS
-        ):
+        if current and (len(current) >= MAX_COMMENT_CODING_BATCH_ITEMS or next_size > MAX_COMMENT_CODING_BATCH_CHARS):
             batches.append(current)
             current = []
             current_size = 0
@@ -593,10 +581,7 @@ def _chunk_records_by_chars(
         record_size = _json_size(record)
         should_split = bool(
             current
-            and (
-                current_size + record_size > max_chars
-                or (max_items is not None and len(current) >= max_items)
-            )
+            and (current_size + record_size > max_chars or (max_items is not None and len(current) >= max_items))
         )
         if should_split:
             batches.append(current)
