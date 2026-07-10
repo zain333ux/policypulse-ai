@@ -59,9 +59,9 @@ def inject_styles() -> None:
         }
 
         .block-container {
-            max-width: 1320px;
-            padding-top: 1.7rem;
-            padding-bottom: 2.2rem;
+            max-width: 1240px;
+            padding-top: 1.45rem;
+            padding-bottom: 2rem;
         }
 
         [data-testid="stSidebar"] {
@@ -75,7 +75,7 @@ def inject_styles() -> None:
         }
 
         .pp-sidebar-shell {
-            padding: 1rem 0.2rem 0.3rem 0.2rem;
+            padding: 0.85rem 0.15rem 0.2rem 0.15rem;
         }
 
         .pp-sidebar-brand {
@@ -84,7 +84,7 @@ def inject_styles() -> None:
             padding: 1.05rem 1rem;
             background: linear-gradient(180deg, rgba(16, 31, 50, 0.95), rgba(12, 24, 39, 0.92));
             box-shadow: var(--shadow);
-            margin-bottom: 0.9rem;
+            margin-bottom: 0.75rem;
         }
 
         .pp-sidebar-kicker {
@@ -98,24 +98,24 @@ def inject_styles() -> None:
 
         .pp-sidebar-title {
             color: white;
-            font-size: 1.22rem;
+            font-size: 1.12rem;
             font-weight: 800;
             line-height: 1.15;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.32rem;
         }
 
         .pp-sidebar-copy {
             color: var(--muted);
-            font-size: 0.92rem;
-            line-height: 1.6;
+            font-size: 0.9rem;
+            line-height: 1.55;
         }
 
         .pp-sidebar-panel {
             border: 1px solid var(--border);
             border-radius: 20px;
-            padding: 0.95rem 0.95rem 0.8rem 0.95rem;
+            padding: 0.9rem 0.9rem 0.75rem 0.9rem;
             background: rgba(13, 24, 39, 0.82);
-            margin-bottom: 0.85rem;
+            margin-bottom: 0.75rem;
         }
 
         .pp-sidebar-panel h4 {
@@ -140,19 +140,19 @@ def inject_styles() -> None:
             border: 1px solid var(--border);
             background:
                 linear-gradient(135deg, rgba(11, 25, 40, 0.96), rgba(9, 20, 32, 0.92)),
-                radial-gradient(circle at 15% 10%, rgba(92, 163, 255, 0.18), transparent 26%);
+                radial-gradient(circle at 15% 10%, rgba(92, 163, 255, 0.16), transparent 24%);
             box-shadow: var(--shadow);
-            padding: 2rem 2rem 1.9rem 2rem;
-            margin-bottom: 1.15rem;
+            padding: 1.75rem 1.8rem 1.6rem 1.8rem;
+            margin-bottom: 0.95rem;
         }
 
         .pp-hero::after {
             content: "";
             position: absolute;
             inset: auto -5% -30% auto;
-            width: 320px;
-            height: 320px;
-            background: radial-gradient(circle, rgba(90, 165, 255, 0.18), transparent 60%);
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, rgba(90, 165, 255, 0.14), transparent 60%);
             pointer-events: none;
         }
 
@@ -169,25 +169,25 @@ def inject_styles() -> None:
 
         .pp-title {
             color: white;
-            font-size: 2.45rem;
+            font-size: 2.2rem;
             line-height: 1.06;
             font-weight: 850;
-            max-width: 860px;
-            margin: 0.7rem 0 0.9rem 0;
+            max-width: 760px;
+            margin: 0.6rem 0 0.75rem 0;
         }
 
         .pp-subtitle {
             color: var(--muted);
             font-size: 1rem;
-            max-width: 860px;
-            line-height: 1.75;
+            max-width: 720px;
+            line-height: 1.68;
         }
 
         .pp-chip-row {
             display: flex;
             gap: 0.65rem;
             flex-wrap: wrap;
-            margin-top: 1.1rem;
+            margin-top: 0.95rem;
         }
 
         .pp-chip {
@@ -202,6 +202,7 @@ def inject_styles() -> None:
             font-weight: 600;
         }
 
+        .pp-step-card,
         .pp-section-card,
         .pp-result-card,
         .pp-stat-card {
@@ -211,8 +212,35 @@ def inject_styles() -> None:
             box-shadow: var(--shadow);
         }
 
+        .pp-step-card {
+            padding: 0.9rem 1rem;
+            min-height: 100%;
+        }
+
+        .pp-step-index {
+            color: var(--primary);
+            font-size: 0.76rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .pp-step-title {
+            color: white;
+            font-size: 1rem;
+            font-weight: 720;
+            margin-bottom: 0.28rem;
+        }
+
+        .pp-step-copy {
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
         .pp-section-card {
-            padding: 1.15rem 1.15rem 1rem 1.15rem;
+            padding: 1rem 1rem 0.85rem 1rem;
             height: 100%;
         }
 
@@ -234,8 +262,8 @@ def inject_styles() -> None:
             border: 1px solid var(--border);
             border-radius: 20px;
             background: rgba(16, 31, 49, 0.75);
-            padding: 0.95rem 1rem;
-            margin-bottom: 0.85rem;
+            padding: 0.85rem 0.95rem;
+            margin-bottom: 0.7rem;
         }
 
         .pp-inline-card-title {
@@ -274,8 +302,8 @@ def inject_styles() -> None:
             border-left: 4px solid var(--primary);
             border-radius: 18px;
             background: rgba(17, 35, 56, 0.78);
-            padding: 0.95rem 1rem;
-            margin: 0.8rem 0;
+            padding: 0.85rem 0.95rem;
+            margin: 0.65rem 0;
         }
 
         .pp-note-title {
@@ -301,31 +329,28 @@ def inject_styles() -> None:
             line-height: 1.7;
         }
 
-        .pp-priority-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 1rem;
-        }
-
-        .pp-priority-card {
+        .pp-takeaway-card {
             border: 1px solid var(--border);
-            border-radius: 22px;
-            background: rgba(16, 31, 49, 0.76);
-            padding: 1rem;
-            height: 100%;
+            border-radius: 24px;
+            background: linear-gradient(180deg, rgba(15, 30, 48, 0.88), rgba(12, 23, 38, 0.88));
+            padding: 1rem 1.05rem;
+            box-shadow: var(--shadow);
         }
 
-        .pp-priority-title {
+        .pp-takeaway-label {
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 0.74rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .pp-takeaway-text {
             color: white;
-            font-weight: 720;
-            margin-bottom: 0.55rem;
-        }
-
-        .pp-priority-list {
-            color: var(--muted);
-            margin: 0;
-            padding-left: 1rem;
+            font-size: 1rem;
             line-height: 1.7;
+            font-weight: 560;
         }
 
         .pp-concern-meta {
@@ -352,8 +377,8 @@ def inject_styles() -> None:
         .pp-badge-danger { background: rgba(255, 143, 168, 0.12); color: #ffc4d1; border-color: rgba(255, 143, 168, 0.18); }
 
         .pp-result-card {
-            padding: 1rem 1.05rem;
-            margin-bottom: 0.9rem;
+            padding: 0.95rem 1rem;
+            margin-bottom: 0.75rem;
         }
 
         .pp-quote {
@@ -379,10 +404,18 @@ def inject_styles() -> None:
         }
 
         .pp-footer-note {
-            margin-top: 1rem;
+            margin-top: 0.85rem;
             color: var(--muted);
             line-height: 1.7;
             font-size: 0.9rem;
+        }
+
+        .pp-results-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin: 0.35rem 0 0.95rem 0;
         }
 
         div[data-testid="stFileUploader"] {
@@ -440,10 +473,15 @@ def inject_styles() -> None:
             background: rgba(14, 26, 42, 0.82);
         }
 
+        [data-testid="stExpander"] {
+            border: 1px solid rgba(140, 170, 210, 0.14);
+            border-radius: 18px;
+            background: rgba(12, 24, 39, 0.62);
+        }
+
         @media (max-width: 980px) {
-            .pp-title { font-size: 2rem; }
-            .pp-hero { padding: 1.5rem; }
-            .pp-priority-grid { grid-template-columns: 1fr; }
+            .pp-title { font-size: 1.9rem; }
+            .pp-hero { padding: 1.4rem; }
         }
         </style>
         """,
@@ -503,10 +541,9 @@ def render_sidebar() -> None:
         """
         <div class="pp-sidebar-brand">
             <div class="pp-sidebar-kicker">PolicyPulse AI</div>
-            <div class="pp-sidebar-title">Multi-agent policy review, built for clear public decision-making.</div>
+            <div class="pp-sidebar-title">Upload a policy. Add real feedback. Get a clearer next step.</div>
             <div class="pp-sidebar-copy">
-                Upload a draft policy, add stakeholder feedback, and turn a messy review cycle into a polished,
-                leadership-ready analysis.
+                A clean workspace for turning policy drafts and public comments into a summary your team can actually use.
             </div>
         </div>
         """,
@@ -521,20 +558,11 @@ def render_sidebar() -> None:
     st.sidebar.markdown(
         """
         <div class="pp-sidebar-panel">
-            <h4>What this workspace delivers</h4>
+            <h4>How to use it</h4>
             <ul class="pp-sidebar-list">
-                <li>Policy summary and rule extraction</li>
-                <li>Support vs opposition sentiment mapping</li>
-                <li>Concern clusters and missing safeguards</li>
-                <li>Recommendations, memo, and survey blueprint</li>
-            </ul>
-        </div>
-        <div class="pp-sidebar-panel">
-            <h4>Best way to demo it</h4>
-            <ul class="pp-sidebar-list">
-                <li>Load the sample or upload a short policy PDF</li>
-                <li>Add comments from CSV, text, or Google Forms</li>
-                <li>Run analysis and walk through the result tabs</li>
+                <li>Add a policy draft</li>
+                <li>Add comments or import responses</li>
+                <li>Run analysis and review the summary first</li>
             </ul>
         </div>
         """,
@@ -542,7 +570,7 @@ def render_sidebar() -> None:
     )
 
     st.sidebar.caption(
-        "If live provider limits are busy, retry after a short pause. This public deployment is tuned for showcase usage."
+        "Built as a public showcase. If live provider limits are busy, retry after a short pause."
     )
     st.sidebar.markdown("</div>", unsafe_allow_html=True)
 
@@ -658,22 +686,34 @@ def render_stat(label: str, value: str) -> None:
     )
 
 
+def build_takeaway(result: dict) -> str:
+    policy = result["policy_analysis"]
+    sentiment = result["sentiment_analysis"]
+    concerns = result["concern_analysis"].get("concern_clusters", [])
+    top_concern = concerns[0].get("theme") if concerns else "several stakeholder concerns"
+    mood = sentiment.get("overall_mood", "mixed").lower()
+    title = policy.get("policy_title", "This policy")
+    return (
+        f"{title} is landing with {mood} feedback so far. "
+        f"The strongest pressure point is {top_concern}. "
+        f"Start with the summary below, then review gaps and recommendations if you need a deeper read."
+    )
+
+
 def render_hero() -> None:
     st.markdown(
         """
         <div class="pp-hero">
-            <div class="pp-eyebrow">Portfolio-ready civic tech workspace</div>
-            <div class="pp-title">Turn policy drafts and stakeholder feedback into clear, defensible recommendations.</div>
+            <div class="pp-eyebrow">Policy review, without the clutter</div>
+            <div class="pp-title">Upload a policy. Add real feedback. Get a clearer next step.</div>
             <div class="pp-subtitle">
-                PolicyPulse AI combines structured policy extraction, public sentiment review, concern clustering,
-                gap detection, and recommendation generation in one polished analysis flow built for universities,
-                student bodies, NGOs, and consultation teams.
+                PolicyPulse AI helps teams review draft policies faster. It pulls out the core rules, surfaces the
+                biggest concerns, and turns scattered comments into a sharper decision.
             </div>
             <div class="pp-chip-row">
-                <span class="pp-chip">Multi-agent analysis</span>
-                <span class="pp-chip">Upload or paste workflow</span>
-                <span class="pp-chip">Executive memo output</span>
-                <span class="pp-chip">Google-Forms-ready survey blueprint</span>
+                <span class="pp-chip">Policy summary</span>
+                <span class="pp-chip">Public feedback analysis</span>
+                <span class="pp-chip">Executive memo</span>
             </div>
         </div>
         """,
@@ -682,6 +722,43 @@ def render_hero() -> None:
 
 
 def render_input_workspace() -> tuple[object, str, object, str]:
+    step1, step2, step3 = st.columns(3, gap="medium")
+    with step1:
+        st.markdown(
+            """
+            <div class="pp-step-card">
+                <div class="pp-step-index">Step 1</div>
+                <div class="pp-step-title">Add the policy</div>
+                <div class="pp-step-copy">Upload a file or paste the draft you want reviewed.</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with step2:
+        st.markdown(
+            """
+            <div class="pp-step-card">
+                <div class="pp-step-index">Step 2</div>
+                <div class="pp-step-title">Add feedback</div>
+                <div class="pp-step-copy">Use a CSV, plain text comments, or imported form responses.</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with step3:
+        st.markdown(
+            """
+            <div class="pp-step-card">
+                <div class="pp-step-index">Step 3</div>
+                <div class="pp-step-title">Run analysis</div>
+                <div class="pp-step-copy">Start with the summary, then open the deeper tabs only when you need them.</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("")
+
     left, right = st.columns(2, gap="large")
     with left:
         st.markdown(
@@ -689,7 +766,7 @@ def render_input_workspace() -> tuple[object, str, object, str]:
             <div class="pp-section-card">
                 <div class="pp-section-title">Policy document</div>
                 <div class="pp-section-subtitle">
-                    Upload a PDF, DOCX, or TXT file — or paste the draft policy directly for a quick review.
+                    Upload a PDF, DOCX, or TXT file, or paste the draft directly.
                 </div>
             </div>
             """,
@@ -710,7 +787,7 @@ def render_input_workspace() -> tuple[object, str, object, str]:
             <div class="pp-section-card">
                 <div class="pp-section-title">Public or student feedback</div>
                 <div class="pp-section-subtitle">
-                    Upload CSV or TXT comments, paste one comment per line, or bring in responses from Google Forms.
+                    Upload comments, paste them line by line, or import them from Google Forms.
                 </div>
             </div>
             """,
@@ -729,80 +806,74 @@ def render_input_workspace() -> tuple[object, str, object, str]:
 
 
 def render_google_forms_section() -> None:
-    st.markdown(
-        """
-        <div class="pp-inline-card">
-            <div class="pp-inline-card-title">Optional: import responses from Google Forms</div>
+    with st.expander("Optional: import responses from Google Forms", expanded=False):
+        st.markdown(
+            """
             <div class="pp-inline-card-copy">
-                If you have already collected feedback through a Google Form, enter the form ID below and bring the
-                comments into the analysis workspace.
+                If you have already collected feedback through a Google Form, paste the form ID below and pull those responses into the comment workspace.
             </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    form_id = st.text_input(
-        "Google Form ID",
-        value=st.session_state["google_form_id"],
-        placeholder="Paste the Google Form ID here",
-    )
-    st.session_state["google_form_id"] = form_id
-
-    if st.button("Fetch Google Form responses", use_container_width=True):
-        if not form_id.strip():
-            render_notice(
-                "A quick fix before we continue",
-                "Please paste a Google Form ID first, then try the import again.",
-                "warning",
-            )
-            return
-
-        with st.spinner("Fetching responses from Google Forms..."):
-            fetched = fetch_form_responses(form_id.strip())
-
-        if fetched.get("error"):
-            render_notice(
-                "We couldn’t fetch Google Form responses this time",
-                fetched["error"],
-                "danger",
-            )
-            return
-
-        try:
-            comments, source_col = parse_google_form_csv(fetched.get("csv", ""))
-        except Exception as exc:
-            render_notice(
-                "The Google Form was reached, but the responses could not be prepared",
-                f"{exc} If your sheet uses a custom column layout, make sure one column contains the actual feedback text.",
-                "warning",
-            )
-            return
-
-        st.session_state["comments_text"] = "\n".join(comments)
-        render_notice(
-            "Responses imported successfully",
-            f"We loaded {len(comments)} responses from the “{source_col}” column and placed them into the comments workspace.",
-            "success",
+            """,
+            unsafe_allow_html=True,
         )
-        st.rerun()
+
+        form_id = st.text_input(
+            "Google Form ID",
+            value=st.session_state["google_form_id"],
+            placeholder="Paste the Google Form ID here",
+        )
+        st.session_state["google_form_id"] = form_id
+
+        if st.button("Fetch Google Form responses", use_container_width=True):
+            if not form_id.strip():
+                render_notice(
+                    "A quick fix before we continue",
+                    "Please paste a Google Form ID first, then try the import again.",
+                    "warning",
+                )
+                return
+
+            with st.spinner("Fetching responses from Google Forms..."):
+                fetched = fetch_form_responses(form_id.strip())
+
+            if fetched.get("error"):
+                render_notice(
+                    "We couldn’t fetch Google Form responses this time",
+                    fetched["error"],
+                    "danger",
+                )
+                return
+
+            try:
+                comments, source_col = parse_google_form_csv(fetched.get("csv", ""))
+            except Exception as exc:
+                render_notice(
+                    "The Google Form was reached, but the responses could not be prepared",
+                    f"{exc} If your sheet uses a custom column layout, make sure one column contains the actual feedback text.",
+                    "warning",
+                )
+                return
+
+            st.session_state["comments_text"] = "\n".join(comments)
+            render_notice(
+                "Responses imported successfully",
+                f"We loaded {len(comments)} responses from the “{source_col}” column and placed them into the comments workspace.",
+                "success",
+            )
+            st.rerun()
 
 
 def render_action_row(policy_file, comments_file) -> None:
-    info_col, analyze_col, survey_col = st.columns([1.2, 1, 1], gap="medium")
+    info_col, analyze_col = st.columns([1.35, 1], gap="medium")
 
     with info_col:
         render_notice(
-            "A small note for public demos",
-            "This showcase deployment runs live AI analysis. During busy periods you may occasionally see temporary failures or slower responses due to shared API limits.",
+            "Before you run it",
+            "Start with the main analysis. The app already prepares the survey blueprint as part of that run, so you do not need to launch two separate workflows unless you want a survey on its own.",
             "warning",
         )
 
     with analyze_col:
         analyze_clicked = st.button("Analyze policy", type="primary", use_container_width=True)
-
-    with survey_col:
-        survey_clicked = st.button("Generate survey blueprint", use_container_width=True)
 
     if analyze_clicked:
         try:
@@ -827,7 +898,7 @@ def render_action_row(policy_file, comments_file) -> None:
                 st.session_state["survey_results"] = result.get("survey")
                 render_notice(
                     "Analysis finished successfully",
-                    "Your results are ready below. You can now review the tabs, export the report, or continue with the survey blueprint.",
+                    "Your summary is ready below. Start there, then open the deeper sections only if you need them.",
                     "success",
                 )
         except Exception as exc:
@@ -847,29 +918,34 @@ def render_action_row(policy_file, comments_file) -> None:
                 friendly = f"Something interrupted the analysis run: {message}"
             render_notice("The analysis could not finish just yet", friendly, "danger")
 
-    if survey_clicked:
-        try:
-            policy_input = read_policy_input(policy_file, st.session_state["policy_text"])
-            if not policy_input:
+    with st.expander("Only need a survey blueprint?", expanded=False):
+        st.markdown(
+            "Use this only when you want consultation questions without running the full policy analysis."
+        )
+        survey_clicked = st.button("Generate survey blueprint only", use_container_width=True)
+        if survey_clicked:
+            try:
+                policy_input = read_policy_input(policy_file, st.session_state["policy_text"])
+                if not policy_input:
+                    render_notice(
+                        "We need a policy document first",
+                        "Please upload or paste the policy draft before generating a survey blueprint.",
+                        "warning",
+                    )
+                else:
+                    survey = run_survey_workflow(policy_input)
+                    st.session_state["survey_results"] = survey
+                    render_notice(
+                        "Survey blueprint ready",
+                        "You can review the structure below and optionally deploy it to Google Forms.",
+                        "success",
+                    )
+            except Exception as exc:
                 render_notice(
-                    "We need a policy document first",
-                    "Please upload or paste the policy draft before generating a survey blueprint.",
-                    "warning",
+                    "The survey blueprint could not be generated",
+                    f"We hit an issue while preparing the survey flow: {exc}",
+                    "danger",
                 )
-            else:
-                survey = run_survey_workflow(policy_input)
-                st.session_state["survey_results"] = survey
-                render_notice(
-                    "Survey blueprint ready",
-                    "You can review the structure below and optionally deploy it to Google Forms.",
-                    "success",
-                )
-        except Exception as exc:
-            render_notice(
-                "The survey blueprint could not be generated",
-                f"We hit an issue while preparing the survey flow: {exc}",
-                "danger",
-            )
 
 
 def render_overview(result: dict) -> None:
@@ -891,13 +967,12 @@ def render_overview(result: dict) -> None:
     with m4:
         render_stat("Overall mood", sentiment.get("overall_mood", "Unknown"))
 
+    takeaway = build_takeaway(result)
     st.markdown(
         f"""
-        <div class="pp-result-card">
-            <div class="pp-section-title">{policy.get("policy_title", "Policy analysis summary")}</div>
-            <div class="pp-section-subtitle">
-                Structured extraction of rules, affected groups, and clarity gaps — paired with evidence-informed public feedback synthesis.
-            </div>
+        <div class="pp-takeaway-card">
+            <div class="pp-takeaway-label">Fast read</div>
+            <div class="pp-takeaway-text">{takeaway}</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -992,40 +1067,51 @@ def render_gaps(result: dict) -> None:
 def render_recommendations(result: dict) -> None:
     recommendations = result["recommendations"]
     items = recommendations.get("recommendations", [])
-    grouped = {"Critical": [], "Important": [], "Nice-to-have": []}
+    top_three = items[:3]
+    remaining = items[3:]
 
-    for item in items:
-        grouped.setdefault(item.get("priority", "Important"), []).append(item.get("action", ""))
-
-    st.markdown('<div class="pp-priority-grid">', unsafe_allow_html=True)
-    cols = st.columns(3)
-    for col, priority in zip(cols, ["Critical", "Important", "Nice-to-have"]):
-        with col:
-            tone = {"Critical": "danger", "Important": "warning", "Nice-to-have": "primary"}[priority]
-            bullet_items = grouped.get(priority, []) or ["No recommendations in this group."]
-            bullet_html = "".join(f"<li>{item}</li>" for item in bullet_items)
+    st.markdown("### Top recommended actions")
+    if top_three:
+        for item in top_three:
+            priority = item.get("priority", "Important")
+            tone = {"Critical": "danger", "Important": "warning", "Nice-to-have": "primary"}.get(priority, "primary")
             st.markdown(
                 f"""
-                <div class="pp-priority-card">
-                    <div class="pp-priority-title">{priority}</div>
-                    <div style="margin-bottom:0.7rem;">{render_badge(priority, tone)}</div>
-                    <ul class="pp-priority-list">{bullet_html}</ul>
+                <div class="pp-result-card">
+                    <div class="pp-inline-card-title">{item.get('action', '')}</div>
+                    <div style="margin-top:0.35rem;">{render_badge(priority, tone)}</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
-    st.markdown("</div>", unsafe_allow_html=True)
+    else:
+        st.info("No recommendations are available yet.")
+
+    if remaining:
+        with st.expander("See the full recommendation set", expanded=False):
+            for item in remaining:
+                priority = item.get("priority", "Important")
+                tone = {"Critical": "danger", "Important": "warning", "Nice-to-have": "primary"}.get(priority, "primary")
+                st.markdown(
+                    f"""
+                    <div class="pp-result-card">
+                        <div class="pp-inline-card-title">{item.get('action', '')}</div>
+                        <div style="margin-top:0.35rem;">{render_badge(priority, tone)}</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
 
     revised = recommendations.get("revised_policy_suggestions", [])
     questions = recommendations.get("meeting_questions", [])
     if revised:
-        st.markdown("### Suggested wording updates")
-        for item in revised:
-            st.markdown(f"- {item}")
+        with st.expander("Suggested wording updates", expanded=False):
+            for item in revised:
+                st.markdown(f"- {item}")
     if questions:
-        st.markdown("### Stakeholder meeting questions")
-        for item in questions:
-            st.markdown(f"- {item}")
+        with st.expander("Stakeholder meeting questions", expanded=False):
+            for item in questions:
+                st.markdown(f"- {item}")
 
 
 def render_memo(result: dict) -> None:
@@ -1035,7 +1121,7 @@ def render_memo(result: dict) -> None:
         <div class="pp-memo">
             <div class="pp-section-title">Executive memo</div>
             <div class="pp-section-subtitle">
-                A concise leadership-ready summary generated from the uploaded policy and stakeholder feedback.
+                The shortest leadership-ready read in the app.
             </div>
             <div class="pp-memo-body">{memo.replace(chr(10), '<br><br>')}</div>
         </div>
@@ -1114,13 +1200,21 @@ def render_survey(result: dict) -> None:
 
 def render_results(result: dict, survey_result: dict | None) -> None:
     st.markdown("---")
+    st.markdown("## Analysis summary")
     report_md = build_markdown_report(result)
-    st.download_button(
-        "Download Markdown report",
-        data=report_md,
-        file_name="policypulse-report.md",
-        mime="text/markdown",
-    )
+    toolbar_left, toolbar_right = st.columns([1.4, 1], gap="medium")
+    with toolbar_left:
+        st.markdown(
+            "Start with the overview tab. The rest is there when you want more detail, not all at once."
+        )
+    with toolbar_right:
+        st.download_button(
+            "Download Markdown report",
+            data=report_md,
+            file_name="policypulse-report.md",
+            mime="text/markdown",
+            use_container_width=True,
+        )
 
     tabs = st.tabs(
         [
