@@ -555,8 +555,7 @@ def nav_button(label: str, view_key: str, icon: str, enabled: bool = True) -> No
         button_label,
         key=f"nav_{view_key}",
         use_container_width=True,
-        disabled=not enabled,
-        type="primary" if selected and enabled else "secondary",
+        type="primary" if selected else "secondary",
     ):
         st.session_state["current_view"] = view_key
         st.rerun()
@@ -579,11 +578,11 @@ def render_sidebar() -> None:
 
     st.sidebar.markdown("### Navigate")
     nav_button("Home", "home", "⌂", True)
-    nav_button("Analysis", "analysis", "◔", analysis_ready())
-    nav_button("Concerns", "concerns", "⚑", analysis_ready())
-    nav_button("Recommendations", "recommendations", "✦", analysis_ready())
-    nav_button("Memo", "memo", "▣", analysis_ready())
-    nav_button("Survey", "survey", "☰", analysis_ready() or policy_loaded())
+    nav_button("Analysis", "analysis", "◔", True)
+    nav_button("Concerns", "concerns", "⚑", True)
+    nav_button("Recommendations", "recommendations", "✦", True)
+    nav_button("Memo", "memo", "▣", True)
+    nav_button("Survey", "survey", "☰", True)
 
     st.sidebar.markdown("---")
     st.sidebar.markdown("### Quick actions")
