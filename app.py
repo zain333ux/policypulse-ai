@@ -507,6 +507,7 @@ def init_state() -> None:
         "google_form_id": "",
         "demo_policy": demo_policy,
         "demo_comments": demo_comments,
+        "current_view": "home",
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -535,6 +536,32 @@ def render_badge(text: str, tone: str = "primary") -> str:
     return f'<span class="pp-badge pp-badge-{tone}">{text}</span>'
 
 
+def policy_loaded() -> bool:
+    return bool(st.session_state.get("policy_text", "").strip())
+
+
+def comments_loaded() -> bool:
+    return bool(st.session_state.get("comments_text", "").strip())
+
+
+def analysis_ready() -> bool:
+    return st.session_state.get("analysis_results") is not None
+
+
+def nav_button(label: str, view_key: str, icon: str, enabled: bool = True) -> None:
+    selected = st.session_state.get("current_view") == view_key
+    button_label = f"{icon}  {label}"
+    if st.sidebar.button(
+        button_label,
+        key=f"nav_{view_key}",
+        use_container_width=True,
+        disabled=not enabled,
+        type="primary" if selected and enabled else "secondary",
+    ):
+        st.session_state["current_view"] = view_key
+        st.rerun()
+
+
 def render_sidebar() -> None:
     st.sidebar.markdown('<div class="pp-sidebar-shell">', unsafe_allow_html=True)
     st.sidebar.markdown(
@@ -550,24 +577,37 @@ def render_sidebar() -> None:
         unsafe_allow_html=True,
     )
 
+    st.sidebar.markdown("### Navigate")
+    nav_button("Home", "home", "⌂", True)
+    nav_button("Analysis", "analysis", "◔", analysis_ready())
+    nav_button("Concerns", "concerns", "⚑", analysis_ready())
+    nav_button("Recommendations", "recommendations", "✦", analysis_ready())
+    nav_button("Memo", "memo", "▣", analysis_ready())
+    nav_button("Survey", "survey", "☰", analysis_ready() or policy_loaded())
+
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### Quick actions")
+
     if st.sidebar.button("Load sample scenario", use_container_width=True):
         st.session_state["policy_text"] = st.session_state["demo_policy"]
         st.session_state["comments_text"] = st.session_state["demo_comments"]
+        st.session_state["current_view"] = "home"
         st.toast("Sample scenario is ready to review.", icon="🗂️")
 
-    st.sidebar.markdown(
-        """
-        <div class="pp-sidebar-panel">
-            <h4>How to use it</h4>
-            <ul class="pp-sidebar-list">
-                <li>Add a policy draft</li>
-                <li>Add comments or import responses</li>
-                <li>Run analysis and review the summary first</li>
-            </ul>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    if st.sidebar.button("Reset workspace", use_container_width=True):
+        st.session_state["policy_text"] = ""
+        st.session_state["comments_text"] = ""
+        st.session_state["analysis_results"] = None
+        st.session_state["survey_results"] = None
+        st.session_state["google_form_id"] = ""
+        st.session_state["current_view"] = "home"
+        st.rerun()
+
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### Workspace status")
+    st.sidebar.caption(f"Policy: {'Loaded' if policy_loaded() else 'Missing'}")
+    st.sidebar.caption(f"Comments: {'Loaded' if comments_loaded() else 'Missing'}")
+    st.sidebar.caption(f"Analysis: {'Ready' if analysis_ready() else 'Not ready'}")
 
     st.sidebar.caption(
         "Built as a public showcase. If live provider limits are busy, retry after a short pause."
@@ -862,6 +902,14 @@ def render_google_forms_section() -> None:
             st.rerun()
 
 
+def render_pre_results_message() -> None:
+    render_notice(
+        "Run the analysis first",
+        "This section unlocks after you analyze a policy and its comments. Start from Home, then come back here.",
+        "primary",
+    )
+
+
 def render_action_row(policy_file, comments_file) -> None:
     info_col, analyze_col = st.columns([1.35, 1], gap="medium")
 
@@ -896,6 +944,7 @@ def render_action_row(policy_file, comments_file) -> None:
                 result = run_analysis_workflow(policy_input, comment_input)
                 st.session_state["analysis_results"] = result
                 st.session_state["survey_results"] = result.get("survey")
+                st.session_state["current_view"] = "analysis"
                 render_notice(
                     "Analysis finished successfully",
                     "Your summary is ready below. Start there, then open the deeper sections only if you need them.",
@@ -1240,10 +1289,7 @@ def render_results(result: dict, survey_result: dict | None) -> None:
         render_survey(survey_result or result)
 
 
-def main() -> None:
-    inject_styles()
-    init_state()
-    render_sidebar()
+def render_home_view() -> None:
     render_hero()
 
     if not get_secret("GROQ_API_KEY"):
@@ -1257,22 +1303,98 @@ def main() -> None:
     render_google_forms_section()
     render_action_row(policy_file, comments_file)
 
-    result = st.session_state.get("analysis_results")
-    survey_result = st.session_state.get("survey_results")
-
-    if result is None and survey_result is None:
+    if not analysis_ready() and st.session_state.get("survey_results") is None:
         render_notice(
             "Ready when you are",
             "Load the sample scenario from the sidebar or upload your own policy and comments to start a live review.",
             "primary",
         )
-        return
 
-    if result is not None:
-        render_results(result, survey_result)
-    elif survey_result is not None:
-        st.markdown("---")
-        render_survey(survey_result)
+
+def render_analysis_view() -> None:
+    result = st.session_state.get("analysis_results")
+    if result is None:
+        render_pre_results_message()
+        return
+    st.markdown("## Analysis")
+    render_overview(result)
+
+
+def render_concerns_view() -> None:
+    result = st.session_state.get("analysis_results")
+    if result is None:
+        render_pre_results_message()
+        return
+    st.markdown("## Concerns and gaps")
+    top, bottom = st.tabs(["Public concerns", "Policy gaps"])
+    with top:
+        render_concerns(result)
+    with bottom:
+        render_gaps(result)
+
+
+def render_recommendations_view() -> None:
+    result = st.session_state.get("analysis_results")
+    if result is None:
+        render_pre_results_message()
+        return
+    st.markdown("## Recommendations")
+    render_recommendations(result)
+
+
+def render_memo_view() -> None:
+    result = st.session_state.get("analysis_results")
+    if result is None:
+        render_pre_results_message()
+        return
+    st.markdown("## Executive memo")
+    report_md = build_markdown_report(result)
+    st.download_button(
+        "Download Markdown report",
+        data=report_md,
+        file_name="policypulse-report.md",
+        mime="text/markdown",
+        use_container_width=True,
+    )
+    render_memo(result)
+
+
+def render_survey_view() -> None:
+    result = st.session_state.get("analysis_results")
+    survey_result = st.session_state.get("survey_results")
+    active = survey_result or result
+    if active is None:
+        render_notice(
+            "No survey blueprint yet",
+            "Generate a survey from the Home screen or run a full analysis first.",
+            "primary",
+        )
+        return
+    st.markdown("## Survey builder")
+    render_survey(active)
+
+
+def main() -> None:
+    inject_styles()
+    init_state()
+    render_sidebar()
+    view = st.session_state.get("current_view", "home")
+
+    if view == "home":
+        render_home_view()
+    elif view == "analysis":
+        render_analysis_view()
+    elif view == "concerns":
+        render_concerns_view()
+    elif view == "recommendations":
+        render_recommendations_view()
+    elif view == "memo":
+        render_memo_view()
+    elif view == "survey":
+        render_survey_view()
+    else:
+        st.session_state["current_view"] = "home"
+        render_home_view()
 
 
 if __name__ == "__main__":
